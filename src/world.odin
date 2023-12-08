@@ -1,5 +1,5 @@
 package main
 
 World :: struct {
-    entities: []Entity
+    entities: [dynamic]Entity
 }

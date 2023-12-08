@@ -1,8 +1,11 @@
 package main
 
 import "vendor:raylib"
+import "core:fmt"
 
 main :: proc() {
+    fmt.println(raylib.rlGetVersion())
+
     game_state := game_state_setup()
     window_setup()
 
@@ -24,7 +27,10 @@ game_state_setup :: proc() -> Game_State {
     game_state := Game_State{}
     game_state.sprites = load_sprites()
     
-    // append(game_state.world.entities, Entity{})
+    append(&game_state.world.entities, Entity{})
+    append(&game_state.world.entities, Entity{})
+    append(&game_state.world.entities, Entity{})
+
     return game_state
 }
 
