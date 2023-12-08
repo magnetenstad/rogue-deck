@@ -3,7 +3,7 @@ package main
 import "vendor:raylib"
 
 main :: proc() {
-    game_state := GameState{}
+    game_state := game_state_setup()
     window_setup()
 
     for !raylib.WindowShouldClose() {
@@ -14,16 +14,33 @@ main :: proc() {
     raylib.CloseWindow()
 }
 
-GameState :: struct {
+Game_State :: struct {
+    world: World,
+    player: ^Player,
+    sprites: map[Sprite_Id]raylib.Texture
 }
 
-main_step :: proc(state: ^GameState) {
-
+game_state_setup :: proc() -> Game_State {
+    game_state := Game_State{}
+    game_state.sprites = load_sprites()
+    
+    // append(game_state.world.entities, Entity{})
+    return game_state
 }
 
-main_draw :: proc(state: ^GameState) {
+main_step :: proc(state: ^Game_State) {
+    for _, i in state.world.entities {
+        entity_step(&state.world.entities[i])
+    }
+}
+
+main_draw :: proc(state: ^Game_State) {
     raylib.BeginDrawing()
     defer raylib.EndDrawing()
 
     raylib.ClearBackground(raylib.GRAY)
+    
+    for _, i in state.world.entities {
+        entity_draw(&state.world.entities[i], state)
+    }
 }
