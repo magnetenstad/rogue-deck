@@ -28,15 +28,15 @@ entity_step :: proc(entity: ^Entity) {
     entity.velocity *= 0.95
 }
 
-entity_union_draw :: proc(entity: ^Entity_Union, game_state: ^Game_State) {
+entity_union_draw :: proc(entity: ^Entity_Union) {
     switch e in entity {
-        case Entity: entity_draw(&e, game_state);
-        case Player: entity_draw(&e, game_state);
-        case Enemy: entity_draw(&e, game_state);
+        case Entity: entity_draw(&e);
+        case Player: entity_draw(&e);
+        case Enemy: entity_draw(&e);
     }
 }
 
-entity_draw :: proc(entity: ^Entity, game_state: ^Game_State) {
+entity_draw :: proc(entity: ^Entity) {
     texture := game_state.sprites[entity.sprite_id]
     rl.DrawTexture(texture, 
         i32(entity.position.x), i32(entity.position.y), rl.WHITE)
