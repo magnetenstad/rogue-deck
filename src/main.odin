@@ -44,6 +44,8 @@ main_step :: proc(game_state: ^Game_State) {
         entity := &game_state.world.entities[entity_id]
         entity_step(entity)
     }
+
+    camera_step(&game_state.graphics.camera, game_state)
 }
 
 main_draw :: proc(game_state: ^Game_State) {
@@ -56,8 +58,10 @@ main_draw :: proc(game_state: ^Game_State) {
             for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
                 if ((x % 2) + (y % 2)) != 1 do continue;
                 rl.DrawRectangle(
-                    i32(x) * GRID_SIZE, i32(y) * GRID_SIZE, 
-                    GRID_SIZE, GRID_SIZE, 
+                    i32((f32(x) - game_state.graphics.camera.position.x) * GRID_SIZE), 
+                    i32((f32(y) - game_state.graphics.camera.position.y) * GRID_SIZE), 
+                    GRID_SIZE, 
+                    GRID_SIZE, 
                     {40, 26, 30, 255})
             }
         }

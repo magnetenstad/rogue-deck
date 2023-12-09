@@ -2,6 +2,7 @@ package main
 
 import rl "vendor:raylib"
 import "core:math"
+import "core:math/linalg"
 
 Entity_Kind :: enum {
     player,
@@ -24,15 +25,22 @@ entity_step :: proc(entity: ^Entity) {
         case .enemy: enemy_step(entity)
     }
 
-    entity.draw_position += (entity.position - entity.draw_position) * 0.2
+    if linalg.length(entity.position - entity.draw_position) < ONE_PIXEL {
+        entity.draw_position = entity.position
+    } else {
+        entity.draw_position += (entity.position - entity.draw_position) * 0.2
+    }
 
     chunk_validate(&get_game_state().world, entity.id)
 }
 
 entity_draw :: proc(entity: ^Entity) {
-    texture := get_game_state().graphics.sprites[entity.sprite_id]
+    graphics := &get_game_state().graphics
+    texture := graphics.sprites[entity.sprite_id]
+    x := entity.draw_position.x - graphics.camera.position.x
+    y := entity.draw_position.y - graphics.camera.position.y
     rl.DrawTexture(texture, 
-        i32(entity.draw_position.x * GRID_SIZE), 
-        i32(entity.draw_position.y * GRID_SIZE), 
+        i32(x * GRID_SIZE), 
+        i32(y * GRID_SIZE), 
         rl.WHITE)
 }
