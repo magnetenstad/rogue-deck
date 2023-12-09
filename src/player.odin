@@ -2,9 +2,6 @@ package main
 
 import rl "vendor:raylib"
 
-Player :: struct {
-}
-
 player_step :: proc(player: ^Entity) {
     if (rl.IsKeyPressed(.W)) { player.position.y -= 1 }
     if (rl.IsKeyPressed(.A)) { player.position.x -= 1 }

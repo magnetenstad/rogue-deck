@@ -38,7 +38,6 @@ world_add_entity :: proc(world: ^World, entity: Entity) -> int {
 }
 
 // Places the given entity in the chunk that matches its position
-@(private="file")
 chunk_add_entity :: proc(world: ^World, entity_id: int) {
     entity := &world.entities[entity_id]
     chunk_position := world_to_chunk(entity.position)
@@ -83,8 +82,8 @@ chunk_validate :: proc(world: ^World, entity_id: int) {
     chunk_before := &world.chunks[entity.chunk]
     removed := false
 
-    for _, i in chunk_before.entity_ids {
-        if chunk_before.entity_ids[i] == entity.id {
+    for entity_id, i in chunk_before.entity_ids {
+        if entity_id == entity.id {
             unordered_remove(&chunk_before.entity_ids, i)
             removed = true
             break

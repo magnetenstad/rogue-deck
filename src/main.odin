@@ -3,6 +3,7 @@ package main
 import rl "vendor:raylib"
 import "core:fmt"
 import "core:strings"
+import "core:os"
 
 @(private="file")
 game_state : Game_State
@@ -12,9 +13,14 @@ get_game_state :: proc() -> ^Game_State {
 }
 
 main :: proc() {
-    fmt.println(rl.rlGetVersion())
-
-    game_state = game_state_create()
+    
+    data_read, ok := os.read_entire_file("saves/data.json")
+    if ok {
+        game_state = game_state_deserialize(data_read)
+    } else {
+        game_state = game_state_create()
+    }
+    
     graphics_create(&game_state)
 
     for !rl.WindowShouldClose() {
@@ -22,6 +28,9 @@ main :: proc() {
         main_draw(&game_state)
     }
 
+    data_to_write, _ :=  game_state_serialize(&game_state)
+    os.write_entire_file("saves/data.json", data_to_write)
+   
     rl.CloseWindow()
 }
 
