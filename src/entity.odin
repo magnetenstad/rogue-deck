@@ -18,8 +18,8 @@ Entity :: struct {
 entity_union_step :: proc(entity: ^Entity_Union) {
     switch e in entity {
         case Entity: entity_step(&e)
-        case Player: player_step(&e); entity_step(&e)
-        case Enemy: enemy_step(&e); entity_step(&e)
+        case Player: player_step(&e)
+        case Enemy: enemy_step(&e)
     }
 }
 
@@ -37,7 +37,7 @@ entity_union_draw :: proc(entity: ^Entity_Union) {
 }
 
 entity_draw :: proc(entity: ^Entity) {
-    texture := game_state.sprites[entity.sprite_id]
+    texture := get_game_state().graphics.sprites[entity.sprite_id]
     rl.DrawTexture(texture, 
         i32(entity.position.x), i32(entity.position.y), rl.WHITE)
 }

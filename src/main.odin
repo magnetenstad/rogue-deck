@@ -3,55 +3,62 @@ package main
 import rl "vendor:raylib"
 import "core:fmt"
 
+@(private="file")
 game_state : Game_State
+
+get_game_state :: proc() -> ^Game_State {
+    return &game_state
+}
 
 main :: proc() {
     fmt.println(rl.rlGetVersion())
 
-    window_setup()
-    game_state = game_state_setup()
+    game_state = game_state_create()
+    graphics_create(&game_state)
 
     for !rl.WindowShouldClose() {
-        main_step()
-        main_draw()
+        main_step(&game_state)
+        main_draw(&game_state)
     }
 
     rl.CloseWindow()
 }
 
-Game_State :: struct {
-    world: World,
-    player: ^Player,
-    sprites: map[Sprite_Id]rl.Texture
-}
-
-game_state_setup :: proc() -> Game_State {
-    game_state := Game_State{}
-    game_state.sprites = load_sprites()
-    
-    append(&game_state.world.entities, Player{entity=Entity{sprite_id=.player, position={200, 200}}})
-    append(&game_state.world.entities, Enemy{entity=Entity{sprite_id=.skeleton, position={0, 0}}})
-    append(&game_state.world.entities, Enemy{entity=Entity{sprite_id=.skeleton, position={100, 100}}})
-    append(&game_state.world.entities, Enemy{entity=Entity{sprite_id=.skeleton, position={100, 200}}})
-
-    game_state.player = &game_state.world.entities[0].(Player)
-
-    return game_state
-}
-
-main_step :: proc() {
+main_step :: proc(game_state: ^Game_State) {
     for _, i in game_state.world.entities {
         entity_union_step(&game_state.world.entities[i])
     }
 }
 
-main_draw :: proc() {
-    rl.BeginDrawing()
-    defer rl.EndDrawing()
-
-    rl.ClearBackground(rl.GRAY)
+main_draw :: proc(game_state: ^Game_State) {
     
-    for _, i in game_state.world.entities {
-        entity_union_draw(&game_state.world.entities[i])
+    rl.BeginTextureMode(game_state.graphics.surface);
+    {
+        rl.ClearBackground({0, 0, 0, 255})
+
+        for _, i in game_state.world.entities {
+            entity_union_draw(&game_state.world.entities[i])
+        }
     }
+    rl.EndTextureMode();
+
+    rl.BeginDrawing()
+    {
+        rl.ClearBackground(rl.GRAY)
+
+        texture := game_state.graphics.surface.texture
+        scale : f32 = 4
+
+        rl.DrawTexturePro(
+            texture, 
+            { 0.0, 0.0, f32(texture.width), - f32(texture.height) },
+            { 
+                (f32(rl.GetScreenWidth()) - f32(SURFACE_WIDTH)*scale)*0.5, 
+                (f32(rl.GetScreenHeight()) - f32(SURFACE_HEIGHT)*scale)*0.5,
+                f32(SURFACE_WIDTH*scale), 
+                f32(SURFACE_HEIGHT*scale),
+            }, 
+            { 0, 0 }, 0.0, rl.WHITE);
+    }
+    rl.EndDrawing()
 }

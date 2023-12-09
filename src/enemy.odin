@@ -9,4 +9,6 @@ Enemy :: struct {
 
 enemy_step :: proc(enemy: ^Enemy) {
     enemy.velocity.x += 0.05 * math.sin(f32(rl.GetTime()))
+
+    entity_step(enemy)
 }
