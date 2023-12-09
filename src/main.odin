@@ -47,16 +47,22 @@ main_draw :: proc(game_state: ^Game_State) {
         rl.ClearBackground(rl.GRAY)
 
         texture := game_state.graphics.surface.texture
-        scale : f32 = 4
+        screen_width := f32(rl.GetScreenWidth())
+        screen_height := f32(rl.GetScreenHeight())
+        surface_width := f32(SURFACE_WIDTH)
+        surface_height := f32(SURFACE_HEIGHT)
+        scale := min(
+            screen_width / surface_width, 
+            screen_height / surface_height)
 
         rl.DrawTexturePro(
             texture, 
             { 0.0, 0.0, f32(texture.width), - f32(texture.height) },
             { 
-                (f32(rl.GetScreenWidth()) - f32(SURFACE_WIDTH)*scale)*0.5, 
-                (f32(rl.GetScreenHeight()) - f32(SURFACE_HEIGHT)*scale)*0.5,
-                f32(SURFACE_WIDTH*scale), 
-                f32(SURFACE_HEIGHT*scale),
+                (screen_width - surface_width*scale)*0.5, 
+                (screen_height - surface_height*scale)*0.5,
+                surface_width*scale, 
+                surface_height*scale,
             }, 
             { 0, 0 }, 0.0, rl.WHITE);
     }
