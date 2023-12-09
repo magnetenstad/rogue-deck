@@ -27,9 +27,12 @@ game_state_setup :: proc() -> Game_State {
     game_state := Game_State{}
     game_state.sprites = load_sprites()
     
+    append(&game_state.world.entities, Player{Entity{{200, 200}, .player}})
     append(&game_state.world.entities, Entity{{0, 0}, .skeleton})
     append(&game_state.world.entities, Entity{{100, 100}, .skeleton})
     append(&game_state.world.entities, Entity{{100, 200}, .skeleton})
+
+    game_state.player = &game_state.world.entities[0].(Player)
 
     return game_state
 }
@@ -47,6 +50,6 @@ main_draw :: proc(state: ^Game_State) {
     rl.ClearBackground(rl.GRAY)
     
     for _, i in state.world.entities {
-        entity_draw(&state.world.entities[i], state)
+        entity_union_draw(&state.world.entities[i], state)
     }
 }
