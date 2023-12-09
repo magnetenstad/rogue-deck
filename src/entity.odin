@@ -6,34 +6,33 @@ import "core:math"
 Entity_Union :: union {
     Entity,
     Player,
+    Enemy,
 }
 
 Entity :: struct {
-    position: rl.Vector2,
     sprite_id: Sprite_Id,
+    position: rl.Vector2,
+    velocity: rl.Vector2,
 }
 
-Player :: struct {
-    using entity: Entity,
-}
-
-entity_step :: proc(entity: ^Entity_Union) {
+entity_union_step :: proc(entity: ^Entity_Union) {
     switch e in entity {
-        case Entity:
-            e.position.x += math.sin(f32(rl.GetTime()))
-        case Player:
-            player_step(&e)
+        case Entity: entity_step(&e)
+        case Player: player_step(&e); entity_step(&e)
+        case Enemy: enemy_step(&e); entity_step(&e)
     }
 }
 
-player_step :: proc(player: ^Player) {
-
+entity_step :: proc(entity: ^Entity) {
+    entity.position += entity.velocity
+    entity.velocity *= 0.95
 }
 
 entity_union_draw :: proc(entity: ^Entity_Union, game_state: ^Game_State) {
     switch e in entity {
         case Entity: entity_draw(&e, game_state);
         case Player: entity_draw(&e, game_state);
+        case Enemy: entity_draw(&e, game_state);
     }
 }
 

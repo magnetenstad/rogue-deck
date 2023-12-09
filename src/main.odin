@@ -27,10 +27,11 @@ game_state_setup :: proc() -> Game_State {
     game_state := Game_State{}
     game_state.sprites = load_sprites()
     
-    append(&game_state.world.entities, Player{Entity{{200, 200}, .player}})
-    append(&game_state.world.entities, Entity{{0, 0}, .skeleton})
-    append(&game_state.world.entities, Entity{{100, 100}, .skeleton})
-    append(&game_state.world.entities, Entity{{100, 200}, .skeleton})
+    append(&game_state.world.entities, 
+        Player{entity=Entity{sprite_id=.player, position={200, 200}}})
+    append(&game_state.world.entities, Enemy{entity=Entity{sprite_id=.skeleton, position={0, 0}}})
+    append(&game_state.world.entities, Enemy{entity=Entity{sprite_id=.skeleton, position={100, 100}}})
+    append(&game_state.world.entities, Enemy{entity=Entity{sprite_id=.skeleton, position={100, 200}}})
 
     game_state.player = &game_state.world.entities[0].(Player)
 
@@ -39,7 +40,7 @@ game_state_setup :: proc() -> Game_State {
 
 main_step :: proc(state: ^Game_State) {
     for _, i in state.world.entities {
-        entity_step(&state.world.entities[i])
+        entity_union_step(&state.world.entities[i])
     }
 }
 
