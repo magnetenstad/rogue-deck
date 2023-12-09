@@ -13,7 +13,7 @@ Chunk :: struct {
     entity_ids: [dynamic]int
 }
 
-world_to_chunk_entity_union :: proc(entity: ^Entity) -> rl.Vector2 {
+world_to_chunk_entity :: proc(entity: ^Entity) -> rl.Vector2 {
     return world_to_chunk(entity.position)
 }
 
@@ -25,7 +25,7 @@ world_to_chunk_vector :: proc(position: rl.Vector2) -> rl.Vector2 {
 }
 
 world_to_chunk :: proc{
-    world_to_chunk_entity_union,
+    world_to_chunk_entity,
     world_to_chunk_vector,
 }
 

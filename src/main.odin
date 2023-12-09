@@ -42,6 +42,16 @@ main_draw :: proc(game_state: ^Game_State) {
     rl.BeginTextureMode(game_state.graphics.surface);
     {
         rl.ClearBackground({0, 0, 0, 255})
+
+        for x in 0 ..= SURFACE_WIDTH / GRID_SIZE {
+            for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
+                if ((x % 2) + (y % 2)) != 1 do continue;
+                rl.DrawRectangle(
+                    i32(x) * GRID_SIZE, i32(y) * GRID_SIZE, 
+                    GRID_SIZE, GRID_SIZE, 
+                    {40, 26, 30, 255})
+            }
+        }
         
         player := &game_state.world.entities[game_state.player_id]
         for entity_id in world_get_entities_around(
