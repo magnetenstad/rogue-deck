@@ -20,7 +20,7 @@ window_setup :: proc() {
     rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rogue Deck")
     rl.SetWindowState({.WINDOW_RESIZABLE})
     rl.SetTargetFPS(60)
-    when DEV {
-        // rl.SetWindowPosition(1920*2, -256)
+    when DEV && DESKTOP {
+        rl.SetWindowPosition(1920*2, -256)
     }
 }

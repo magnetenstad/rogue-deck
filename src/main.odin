@@ -6,8 +6,8 @@ import "core:fmt"
 main :: proc() {
     fmt.println(rl.rlGetVersion())
 
-    game_state := game_state_setup()
     window_setup()
+    game_state := game_state_setup()
 
     for !rl.WindowShouldClose() {
         main_step(&game_state)
@@ -27,9 +27,9 @@ game_state_setup :: proc() -> Game_State {
     game_state := Game_State{}
     game_state.sprites = load_sprites()
     
-    append(&game_state.world.entities, Entity{})
-    append(&game_state.world.entities, Entity{})
-    append(&game_state.world.entities, Entity{})
+    append(&game_state.world.entities, Entity{{0, 0}, .skeleton})
+    append(&game_state.world.entities, Entity{{100, 100}, .skeleton})
+    append(&game_state.world.entities, Entity{{100, 200}, .skeleton})
 
     return game_state
 }
