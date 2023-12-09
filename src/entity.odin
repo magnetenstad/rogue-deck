@@ -15,7 +15,7 @@ Entity :: struct {
     chunk: IVec2,
     sprite_id: Sprite_Id,
     position: IVec2,
-    draw_position: rl.Vector2,
+    draw_position: FVec2,
 }
 
 entity_step :: proc(entity: ^Entity) {
@@ -25,11 +25,8 @@ entity_step :: proc(entity: ^Entity) {
         case .enemy: enemy_step(entity)
     }
 
-    entity_position := rl.Vector2{ 
-        f32(entity.position.x), f32(entity.position.y) }
-    
     entity.draw_position = move_towards(
-        entity.draw_position, entity_position, 0.25)
+        entity.draw_position, f_vec_2(entity.position), 0.25)
         
     chunk_validate(&get_game_state().world, entity.id)
 }

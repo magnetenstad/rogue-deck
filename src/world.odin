@@ -24,7 +24,7 @@ world_to_chunk_ivec :: proc(position: IVec2) -> IVec2 {
     }
 }
 
-world_to_chunk_vector :: proc(position: rl.Vector2) -> IVec2 {
+world_to_chunk_vector :: proc(position: FVec2) -> IVec2 {
     return IVec2 { 
         int(math.floor(position.x / CHUNK_WIDTH)), 
         int(math.floor(position.y / CHUNK_HEIGHT)),

@@ -53,15 +53,14 @@ main_draw :: proc(game_state: ^Game_State) {
     rl.BeginTextureMode(game_state.graphics.surface);
     {
         rl.ClearBackground({0, 0, 0, 255})
+        camera := &game_state.graphics.camera
 
         for x in 0 ..= SURFACE_WIDTH / GRID_SIZE {
             for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
                 if ((x % 2) + (y % 2)) != 1 do continue;
-                rl.DrawRectangle(
-                    i32((f32(x) - game_state.graphics.camera.position.x) * GRID_SIZE), 
-                    i32((f32(y) - game_state.graphics.camera.position.y) * GRID_SIZE), 
-                    GRID_SIZE, 
-                    GRID_SIZE, 
+                rl.DrawRectangleV(
+                    (f_vec_2(x, y) - camera.position) * GRID_SIZE,
+                    {GRID_SIZE, GRID_SIZE},
                     {40, 26, 30, 255})
             }
         }
@@ -72,6 +71,16 @@ main_draw :: proc(game_state: ^Game_State) {
 
             entity := &game_state.world.entities[entity_id]
             entity_draw(entity)
+        }
+
+        selected_id, ok := game_state.selected_id.(int)
+        if ok {
+            mouse_position := rl.GetMousePosition()
+            entity := game_state.world.entities[selected_id]
+            rl.DrawLineV(
+                f_vec_2(entity.position) - camera.position, 
+                mouse_position, 
+                rl.WHITE)
         }
     }
     rl.EndTextureMode();
