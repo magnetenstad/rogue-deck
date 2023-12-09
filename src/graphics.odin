@@ -21,7 +21,18 @@ Sprite_Paths := [Sprite_Id]string {
 }
 
 graphics_create :: proc(game_state: ^Game_State) {
-    rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rogue Deck")
+    when DEV && DESKTOP {
+        window_width :: 1920
+        window_height :: 2070
+    } else when DEV {
+        window_width :: 800
+        window_height :: 480
+    } else {
+        window_width :: 1920
+        window_height :: 1080
+    }
+    
+    rl.InitWindow(window_width, window_height, "Rogue Deck")
     rl.SetWindowState({.WINDOW_RESIZABLE, .WINDOW_TOPMOST})
     rl.SetTargetFPS(60)
 

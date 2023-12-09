@@ -4,36 +4,30 @@ import rl "vendor:raylib"
 import "core:math"
 
 Entity_Union :: union {
-    Entity,
     Player,
     Enemy,
 }
 
 Entity :: struct {
+    id: int,
+    chunk: rl.Vector2,
     sprite_id: Sprite_Id,
     position: rl.Vector2,
     velocity: rl.Vector2,
-}
-
-entity_union_step :: proc(entity: ^Entity_Union) {
-    switch e in entity {
-        case Entity: entity_step(&e)
-        case Player: player_step(&e)
-        case Enemy: enemy_step(&e)
-    }
+    variant: Entity_Union,
 }
 
 entity_step :: proc(entity: ^Entity) {
+
+    switch e in entity.variant {
+        case Player: player_step(entity)
+        case Enemy: enemy_step(entity)
+    }
+
     entity.position += entity.velocity
     entity.velocity *= 0.95
-}
 
-entity_union_draw :: proc(entity: ^Entity_Union) {
-    switch e in entity {
-        case Entity: entity_draw(&e);
-        case Player: entity_draw(&e);
-        case Enemy: entity_draw(&e);
-    }
+    chunk_validate(&get_game_state().world, entity.id)
 }
 
 entity_draw :: proc(entity: ^Entity) {

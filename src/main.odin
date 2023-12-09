@@ -26,8 +26,14 @@ main :: proc() {
 }
 
 main_step :: proc(game_state: ^Game_State) {
-    for _, i in game_state.world.entities {
-        entity_union_step(&game_state.world.entities[i])
+
+    player := &game_state.world.entities[game_state.player_id]
+
+    for entity_id in world_get_entities_around(
+            &game_state.world, player.position) {
+        
+        entity := &game_state.world.entities[entity_id]
+        entity_step(entity)
     }
 }
 
@@ -36,9 +42,13 @@ main_draw :: proc(game_state: ^Game_State) {
     rl.BeginTextureMode(game_state.graphics.surface);
     {
         rl.ClearBackground({0, 0, 0, 255})
+        
+        player := &game_state.world.entities[game_state.player_id]
+        for entity_id in world_get_entities_around(
+                &game_state.world, player.position) {
 
-        for _, i in game_state.world.entities {
-            entity_union_draw(&game_state.world.entities[i])
+            entity := &game_state.world.entities[entity_id]
+            entity_draw(entity)
         }
     }
     rl.EndTextureMode();
@@ -72,3 +82,4 @@ main_draw :: proc(game_state: ^Game_State) {
     }
     rl.EndDrawing()
 }
+ 
