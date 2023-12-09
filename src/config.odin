@@ -1,6 +1,6 @@
 package main
 
-import "vendor:raylib"
+import rl "vendor:raylib"
 
 DEV :: true
 DESKTOP :: false
@@ -17,11 +17,10 @@ when DEV && DESKTOP {
 }
 
 window_setup :: proc() {
-    using raylib
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rogue Deck")
-    SetWindowState({.WINDOW_RESIZABLE})
-    SetTargetFPS(60)
+    rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rogue Deck")
+    rl.SetWindowState({.WINDOW_RESIZABLE})
+    rl.SetTargetFPS(60)
     when DEV {
-        // SetWindowPosition(1920*2, -256)
+        // rl.SetWindowPosition(1920*2, -256)
     }
 }

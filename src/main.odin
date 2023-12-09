@@ -1,26 +1,26 @@
 package main
 
-import "vendor:raylib"
+import rl "vendor:raylib"
 import "core:fmt"
 
 main :: proc() {
-    fmt.println(raylib.rlGetVersion())
+    fmt.println(rl.rlGetVersion())
 
     game_state := game_state_setup()
     window_setup()
 
-    for !raylib.WindowShouldClose() {
+    for !rl.WindowShouldClose() {
         main_step(&game_state)
         main_draw(&game_state)
     }
 
-    raylib.CloseWindow()
+    rl.CloseWindow()
 }
 
 Game_State :: struct {
     world: World,
     player: ^Player,
-    sprites: map[Sprite_Id]raylib.Texture
+    sprites: map[Sprite_Id]rl.Texture
 }
 
 game_state_setup :: proc() -> Game_State {
@@ -41,10 +41,10 @@ main_step :: proc(state: ^Game_State) {
 }
 
 main_draw :: proc(state: ^Game_State) {
-    raylib.BeginDrawing()
-    defer raylib.EndDrawing()
+    rl.BeginDrawing()
+    defer rl.EndDrawing()
 
-    raylib.ClearBackground(raylib.GRAY)
+    rl.ClearBackground(rl.GRAY)
     
     for _, i in state.world.entities {
         entity_draw(&state.world.entities[i], state)
