@@ -5,7 +5,7 @@ import "core:fmt"
 import "core:math"
 
 World :: struct {
-    chunks: map[rl.Vector2]Chunk,
+    chunks: map[IVec2]Chunk,
     entities: [dynamic]Entity,
 }
 
@@ -13,20 +13,28 @@ Chunk :: struct {
     entity_ids: [dynamic]int
 }
 
-world_to_chunk_entity :: proc(entity: ^Entity) -> rl.Vector2 {
-    return world_to_chunk(entity.position)
+world_to_chunk_entity :: proc(entity: ^Entity) -> IVec2 {
+    return world_to_chunk_ivec(entity.position)
 }
 
-world_to_chunk_vector :: proc(position: rl.Vector2) -> rl.Vector2 {
-    return rl.Vector2 { 
-        math.floor(position.x / CHUNK_WIDTH), 
-        math.floor(position.y / CHUNK_HEIGHT),
+world_to_chunk_ivec :: proc(position: IVec2) -> IVec2 {
+    return IVec2 { 
+        position.x / CHUNK_WIDTH, 
+        position.y / CHUNK_HEIGHT,
+    }
+}
+
+world_to_chunk_vector :: proc(position: rl.Vector2) -> IVec2 {
+    return IVec2 { 
+        int(math.floor(position.x / CHUNK_WIDTH)), 
+        int(math.floor(position.y / CHUNK_HEIGHT)),
     }
 }
 
 world_to_chunk :: proc{
     world_to_chunk_entity,
     world_to_chunk_vector,
+    world_to_chunk_ivec,
 }
 
 world_add_entity :: proc(world: ^World, entity: Entity) -> int {
@@ -52,7 +60,7 @@ chunk_add_entity :: proc(world: ^World, entity_id: int) {
 }
 
 world_get_entities_around :: proc(world: ^World, 
-        world_position: rl.Vector2) -> [dynamic]int {
+        world_position: IVec2) -> [dynamic]int {
 
     entity_ids: [dynamic]int
     
@@ -62,7 +70,7 @@ world_get_entities_around :: proc(world: ^World,
 
     for x := -X; x <= X; x += 1 {
         for y := -Y; y <= Y; y += 1 {
-            chunk_position := chunk_center + { f32(x), f32(y) }
+            chunk_position := chunk_center + { x, y }
             if chunk_position not_in world.chunks do continue;
 
             chunk := world.chunks[chunk_position]

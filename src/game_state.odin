@@ -27,9 +27,9 @@ game_state_create :: proc() -> Game_State {
 
     rng := rand.create(0)
     for i in 0..=100 {
-        position := rl.Vector2{ 
-            math.floor(rand.float32(&rng) * SURFACE_WIDTH / GRID_SIZE), 
-            math.floor(rand.float32(&rng) * SURFACE_HEIGHT / GRID_SIZE), 
+        position := IVec2{ 
+            int(math.floor(rand.float32(&rng) * SURFACE_WIDTH / GRID_SIZE)), 
+            int(math.floor(rand.float32(&rng) * SURFACE_HEIGHT / GRID_SIZE)), 
         }
         world_add_entity(&game_state.world, Entity{kind=.enemy, 
             sprite_id=.skeleton, position=position})

@@ -12,9 +12,9 @@ Entity_Kind :: enum {
 Entity :: struct {
     kind: Entity_Kind,
     id: int,
-    chunk: rl.Vector2,
+    chunk: IVec2,
     sprite_id: Sprite_Id,
-    position: rl.Vector2,
+    position: IVec2,
     draw_position: rl.Vector2,
 }
 
@@ -25,12 +25,12 @@ entity_step :: proc(entity: ^Entity) {
         case .enemy: enemy_step(entity)
     }
 
-    if linalg.length(entity.position - entity.draw_position) < ONE_PIXEL {
-        entity.draw_position = entity.position
-    } else {
-        entity.draw_position += (entity.position - entity.draw_position) * 0.2
-    }
-
+    entity_position := rl.Vector2{ 
+        f32(entity.position.x), f32(entity.position.y) }
+    
+    entity.draw_position = move_towards(
+        entity.draw_position, entity_position, 0.25)
+        
     chunk_validate(&get_game_state().world, entity.id)
 }
 
