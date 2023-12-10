@@ -45,7 +45,19 @@ main_step :: proc(game_state: ^Game_State) {
         entity_step(entity)
     }
 
-    camera_step(&game_state.graphics.camera, game_state)
+    camera := &game_state.graphics.camera
+    camera_step(camera, game_state)
+
+    if rl.IsMouseButtonPressed(.LEFT) {
+        mouse_position := camera_get_mouse_world_position(camera)
+        entity_id, ok := world_get_entity(
+            &game_state.world, mouse_position).(int)
+        if (ok) {
+            game_state.selected_id = entity_id
+        } else {
+            game_state.selected_id = nil
+        }
+    }
 }
 
 main_draw :: proc(game_state: ^Game_State) {
@@ -75,10 +87,10 @@ main_draw :: proc(game_state: ^Game_State) {
 
         selected_id, ok := game_state.selected_id.(int)
         if ok {
-            mouse_position := rl.GetMousePosition()
+            mouse_position := camera_get_mouse_position(camera)
             entity := game_state.world.entities[selected_id]
             rl.DrawLineV(
-                f_vec_2(entity.position) - camera.position, 
+                (f_vec_2(entity.position) - camera.position) * GRID_SIZE, 
                 mouse_position, 
                 rl.WHITE)
         }

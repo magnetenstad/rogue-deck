@@ -101,3 +101,17 @@ chunk_validate :: proc(world: ^World, entity_id: int) {
 
     chunk_add_entity(world, entity_id)
 }
+
+world_get_entity :: proc(world: ^World, 
+        world_position: IVec2) -> Maybe(int) {
+
+    chunk_position := world_to_chunk(world_position)
+    if chunk_position not_in world.chunks do return nil;
+
+    chunk := world.chunks[chunk_position]
+    for entity_id in chunk.entity_ids {
+        entity := &world.entities[entity_id]
+        if entity.position == world_position do return entity_id
+    }
+    return nil
+}
