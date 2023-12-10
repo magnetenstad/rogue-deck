@@ -38,6 +38,19 @@ main_step :: proc(game_state: ^Game_State) {
     player := &game_state.world.entities[game_state.player_id]
 
     // Entities
+    switch game_state.phase {
+        case .turn_player:
+            player_step(player)
+
+        case .turn_enemy:
+            for entity_id in world_get_entities_around(
+                    &game_state.world, player.position) {
+                entity := &game_state.world.entities[entity_id]
+                enemy_step(entity)
+            }
+            game_state.phase = .turn_player
+    }
+    
     for entity_id in world_get_entities_around(
             &game_state.world, player.position) {
         

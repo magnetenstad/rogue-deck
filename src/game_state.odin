@@ -7,11 +7,17 @@ import "core:fmt"
 import "core:encoding/json"
 import "core:io"
 
+Game_Phase :: enum {
+    turn_player,
+    turn_enemy,
+}
+
 Game_State :: struct {
     world: World,
     player_id: int,
     graphics: Graphics,
     selected_id: Maybe(int),
+    phase: Game_Phase
 }
 
 @(private="file")

@@ -3,7 +3,7 @@ package main
 import rl "vendor:raylib"
 
 DEV :: true
-DESKTOP :: true
+DESKTOP :: false
 
 SURFACE_WIDTH :: 480
 SURFACE_HEIGHT :: 270

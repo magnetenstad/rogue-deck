@@ -19,16 +19,12 @@ Entity :: struct {
 }
 
 entity_step :: proc(entity: ^Entity) {
-
-    switch entity.kind {
-        case .player: player_step(entity)
-        case .enemy: enemy_step(entity)
-    }
+    game_state := get_game_state()
 
     entity.draw_position = move_towards(
         entity.draw_position, f_vec_2(entity.position), 0.25)
         
-    chunk_validate(&get_game_state().world, entity.id)
+    chunk_validate(&game_state.world, entity.id)
 }
 
 entity_draw :: proc(entity: ^Entity) {
