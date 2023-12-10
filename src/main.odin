@@ -13,31 +13,31 @@ get_game_state :: proc() -> ^Game_State {
 }
 
 main :: proc() {
-    
+    // Read save file and create game state
     data_read, ok := os.read_entire_file("saves/data.json")
     if ok {
         game_state = game_state_deserialize(data_read)
     } else {
         game_state = game_state_create()
     }
-    
     graphics_create(&game_state)
 
+    // Main loop
     for !rl.WindowShouldClose() {
         main_step(&game_state)
         main_draw(&game_state)
     }
 
+    // Write save file and close
     data_to_write, _ :=  game_state_serialize(&game_state)
     os.write_entire_file("saves/data.json", data_to_write)
-   
     rl.CloseWindow()
 }
 
 main_step :: proc(game_state: ^Game_State) {
-
     player := &game_state.world.entities[game_state.player_id]
 
+    // Entities
     for entity_id in world_get_entities_around(
             &game_state.world, player.position) {
         
@@ -45,9 +45,11 @@ main_step :: proc(game_state: ^Game_State) {
         entity_step(entity)
     }
 
+    // Camera
     camera := &game_state.graphics.camera
     camera_step(camera, game_state)
 
+    // Select entity
     if rl.IsMouseButtonPressed(.LEFT) {
         mouse_position := camera_get_mouse_world_position(camera)
         entity_id, ok := world_get_entity(
@@ -62,11 +64,13 @@ main_step :: proc(game_state: ^Game_State) {
 
 main_draw :: proc(game_state: ^Game_State) {
     
+    // Draw onto texture
     rl.BeginTextureMode(game_state.graphics.surface);
     {
-        rl.ClearBackground({0, 0, 0, 255})
         camera := &game_state.graphics.camera
 
+        // Background
+        rl.ClearBackground({0, 0, 0, 255})
         for x in 0 ..= SURFACE_WIDTH / GRID_SIZE {
             for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
                 if ((x % 2) + (y % 2)) != 1 do continue;
@@ -77,6 +81,7 @@ main_draw :: proc(game_state: ^Game_State) {
             }
         }
         
+        // Entities
         player := &game_state.world.entities[game_state.player_id]
         for entity_id in world_get_entities_around(
                 &game_state.world, player.position) {
@@ -85,6 +90,7 @@ main_draw :: proc(game_state: ^Game_State) {
             entity_draw(entity)
         }
 
+        // Selected entity
         selected_id, ok := game_state.selected_id.(int)
         if ok {
             mouse_position := camera_get_mouse_position(camera)
@@ -97,6 +103,7 @@ main_draw :: proc(game_state: ^Game_State) {
     }
     rl.EndTextureMode();
 
+    // Draw texture onto screen
     rl.BeginDrawing()
     {
         rl.ClearBackground(rl.GRAY)
