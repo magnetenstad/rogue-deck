@@ -48,3 +48,12 @@ move_towards :: proc(position: FVec2, target: FVec2,
         return position + difference * multiplier
     }
 }
+
+array_contains :: proc(array: [dynamic]$T, item: T) -> bool {
+    for i in array {
+        if item == i {
+            return true
+        }
+    }
+    return false
+}

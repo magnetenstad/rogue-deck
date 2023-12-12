@@ -29,18 +29,19 @@ player_step :: proc(player: ^Entity) {
 }
 
 key_queue: [dynamic]rl.KeyboardKey
+wasd: []rl.KeyboardKey = {.W, .A, .S, .D}
 
 player_get_key :: proc() -> rl.KeyboardKey {
-    key_now := rl.GetKeyPressed()
-    if key_now == .W || 
-        key_now == .A || 
-        key_now == .S || 
-        key_now == .D 
-    {
-        append(&key_queue, key_now)
+    for key in wasd {
+        if rl.IsKeyDown(key) && !array_contains(key_queue, key) {
+            append(&key_queue, key)
+        }
     }
-    for len(key_queue) > 0 && !rl.IsKeyDown(key_queue[len(key_queue) - 1]) {
-        pop(&key_queue)
+    for i := 0; i < len(key_queue); i += 1 {
+        if !rl.IsKeyDown(key_queue[i]) {
+            ordered_remove(&key_queue, i)
+            i -= 1
+        }
     }
     key: rl.KeyboardKey = .KEY_NULL
     if len(key_queue) > 0 {
