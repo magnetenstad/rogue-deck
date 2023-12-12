@@ -3,7 +3,9 @@ package main
 import rl "vendor:raylib"
 
 DEV :: true
-DESKTOP :: false
+DESKTOP :: true
+
+LOAD_SAVE :: false
 
 SURFACE_WIDTH :: 480
 SURFACE_HEIGHT :: 270
@@ -17,3 +19,6 @@ GRID_SIZE :: 16
 ONE_PIXEL :: (1.0 / f32(GRID_SIZE))
 
 INPUT_TIMER :: 0.3
+
+CARD_WIDTH :: 120.0
+CARD_HEIGHT :: 200.0

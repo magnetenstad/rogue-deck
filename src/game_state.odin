@@ -14,10 +14,12 @@ Game_Phase :: enum {
 
 Game_State :: struct {
     world: World,
-    player_id: int,
     graphics: Graphics,
+    hand: Hand,
+    deck: Deck,
+    phase: Game_Phase,
+    player_id: int,
     selected_id: Maybe(int),
-    phase: Game_Phase
 }
 
 @(private="file")
@@ -33,13 +35,24 @@ game_state_create :: proc() -> Game_State {
         Entity{kind=.player, sprite_id=.player, position={2, 2}})
 
     rng := rand.create(0)
-    for i in 0..=100 {
+    for i in 0 ..< 100 {
         position := i_vec_2( 
             math.floor(rand.float32(&rng) * SURFACE_WIDTH / GRID_SIZE), 
             math.floor(rand.float32(&rng) * SURFACE_HEIGHT / GRID_SIZE), 
         )
         world_add_entity(&game_state.world, Entity{kind=.enemy, 
             sprite_id=.skeleton, position=position})
+    }
+    for i in 0 ..< 100 {
+        card := Card {
+            name = "Test",
+            cost = i,
+        }
+        append(&game_state.deck.cards, card)
+    }
+    game_state.hand.max_size = 10
+    for i in 0 ..< 9 {
+        hand_draw_from_deck(&game_state.hand, &game_state.deck)
     }
 
     return game_state

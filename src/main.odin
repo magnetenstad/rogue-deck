@@ -15,7 +15,7 @@ get_game_state :: proc() -> ^Game_State {
 main :: proc() {
     // Read save file and create game state
     data_read, ok := os.read_entire_file("saves/data.json")
-    if ok {
+    if ok && LOAD_SAVE {
         game_state = game_state_deserialize(data_read)
     } else {
         game_state = game_state_create()
@@ -143,6 +143,9 @@ main_draw :: proc(game_state: ^Game_State) {
         
         fps := strings.clone_to_cstring(fmt.tprint(rl.GetFPS()))
         rl.DrawText(fps, 16, 16, 16, rl.WHITE)
+
+        // GUI
+        hand_draw_to_screen(&game_state.hand)
     }
     rl.EndDrawing()
 }

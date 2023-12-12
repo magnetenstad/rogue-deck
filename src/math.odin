@@ -15,7 +15,7 @@ f_vec_2_from_i_vec :: proc(ivec: IVec2) -> FVec2 {
     return FVec2 { f32(ivec.x), f32(ivec.y) }
 }
 
-f_vec_2_from_i :: proc(x: int, y: int) -> FVec2 {
+f_vec_2_from_i :: proc(x: $T, y: T) -> FVec2 {
     return FVec2 { f32(x), f32(y) }
 }
 
