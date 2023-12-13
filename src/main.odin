@@ -62,6 +62,9 @@ main_step :: proc(game_state: ^Game_State) {
     camera := &game_state.graphics.camera
     camera_step(camera, game_state)
 
+    // Hand
+    hand_step(&game_state.hand)
+
     // Select entity
     if rl.IsMouseButtonPressed(.LEFT) {
         mouse_position := camera_get_mouse_world_position(camera)

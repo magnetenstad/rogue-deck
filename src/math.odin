@@ -1,7 +1,9 @@
 package main
 
+import "core:fmt"
 import "core:math"
 import "core:math/linalg"
+import "core:slice"
 import rl "vendor:raylib"
 
 mround :: proc(value: f32, multiple: f32) -> f32 {
@@ -37,7 +39,7 @@ i_vec_2 :: proc{
     i_vec_2_from_f_vec,
 }
 
-move_towards :: proc(position: FVec2, target: FVec2, 
+move_towards_vec :: proc(position: FVec2, target: FVec2, 
         multiplier: f32) -> FVec2 {
     difference := (target - position)
     if linalg.length(difference) < ONE_PIXEL {
@@ -49,11 +51,50 @@ move_towards :: proc(position: FVec2, target: FVec2,
     }
 }
 
-array_contains :: proc(array: [dynamic]$T, item: T) -> bool {
-    for i in array {
-        if item == i {
-            return true
+move_towards_scalar :: proc(position: $T/f32, target: T, 
+        multiplier: f32) -> T {
+    difference := target - position
+    length := math.abs(difference)
+    if length < ONE_PIXEL {
+        return target
+    } else if length * multiplier < ONE_PIXEL {
+        return position + math.sign(difference) / GRID_SIZE
+    } else {
+        return position + difference * multiplier
+    }
+}
+
+move_towards :: proc {
+    move_towards_vec,
+    move_towards_scalar,
+}
+
+point_in_rect :: proc(point: FVec2, rect: ^rl.Rectangle) -> bool {
+    return rect.x <= point.x && 
+        point.x <= rect.x + rect.width &&
+        rect.y <= point.y &&
+        point.y <= rect.y + rect.height
+}
+
+sort_indices_by :: proc(data: $T/[]$E, less: proc(i, j: E) -> bool) -> []int {
+	indices := make([]int, len(data))
+	for i in 0 ..< len(data) {
+        indices[i] = -1
+    }
+    for i in 0 ..< len(data) {
+        a_i := i
+
+        for b_i, j in indices {
+            if b_i == -1 {
+                indices[j] = a_i
+                break
+            }
+            is_less := less(data[a_i], data[b_i])
+            if is_less {
+                indices[j] = a_i
+                a_i = b_i
+            }
         }
     }
-    return false
+    return indices
 }

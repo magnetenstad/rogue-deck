@@ -3,6 +3,7 @@ package main
 import rl "vendor:raylib"
 import "core:time"
 import "core:fmt"
+import "core:slice"
 
 time_last_input := time.now()
 
@@ -33,7 +34,7 @@ wasd: []rl.KeyboardKey = {.W, .A, .S, .D}
 
 player_get_key :: proc() -> rl.KeyboardKey {
     for key in wasd {
-        if rl.IsKeyDown(key) && !array_contains(key_queue, key) {
+        if rl.IsKeyDown(key) && !slice.contains(key_queue[:], key) {
             append(&key_queue, key)
         }
     }
