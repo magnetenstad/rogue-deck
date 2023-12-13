@@ -27,16 +27,16 @@ Deck :: struct {
 Hand :: struct {
     cards: [dynamic]PhysicalCard,
     max_size: int,
+    hover_index: Maybe(int),
+    target_position: Maybe(IVec2),
 }
 
-hand_step :: proc(hand: ^Hand) {
+hand_step :: proc(hand: ^Hand, camera: ^Camera) {
     margin :: 32
     origin := f_vec_2(rl.GetScreenWidth(), rl.GetScreenHeight())
     origin.x /= 2
     origin.y -= CARD_HEIGHT / 2 + margin
     width := f32(len(hand.cards) * (CARD_WIDTH + margin))
-    is_hovering := false
-
     sorted_indices := sort_indices_by(
         hand.cards[:], 
         proc(a: PhysicalCard, b: PhysicalCard) -> bool { 
@@ -46,6 +46,7 @@ hand_step :: proc(hand: ^Hand) {
 
     for i in sorted_indices {
         card := &hand.cards[i]
+        hover_index, is_hovering := hand.hover_index.(int)
         
         // Targets
         offset := FVec2 { 
@@ -56,10 +57,22 @@ hand_step :: proc(hand: ^Hand) {
         
         mouse_position := rl.GetMousePosition()
         card_rect := card_get_rect(card)
+
         if !is_hovering && point_in_rect(mouse_position, &card_rect) {
+            hand.hover_index = i
+        }
+
+        if is_hovering && hover_index == i {
             card.target_scale = 2
-            is_hovering = true
             card.z_index = 1
+            card.target_position.y -= CARD_HEIGHT / 2
+
+            if rl.IsMouseButtonDown(.LEFT) {
+                hand.target_position = camera_world_mouse_position(camera)
+            } else if !point_in_rect(mouse_position, &card_rect) {
+                hand.hover_index = nil
+                hand.target_position = nil
+            }
         } else {
             card.target_scale = 1
             card.z_index = 0
@@ -94,7 +107,7 @@ hand_draw_from_deck :: proc(hand: ^Hand, deck: ^Deck) -> bool {
     return true
 }
 
-hand_draw_to_screen :: proc(hand: ^Hand) {
+hand_draw_to_screen :: proc(hand: ^Hand, camera: ^Camera) {
     sorted_indices := sort_indices_by(
         hand.cards[:], 
         proc(a: PhysicalCard, b: PhysicalCard) -> bool { 
@@ -103,6 +116,14 @@ hand_draw_to_screen :: proc(hand: ^Hand) {
     )
     for i in sorted_indices {
         card_draw_to_screen(&hand.cards[i])
+    }
+
+    hover_index, is_hovering := hand.hover_index.(int)
+    target_position, is_targeting := hand.target_position.(IVec2)
+    if is_hovering && is_targeting {
+        card := hand.cards[hover_index]
+        rl.DrawLineV(card.position, 
+            camera_world_to_gui(camera, target_position), rl.WHITE)
     }
 }
 

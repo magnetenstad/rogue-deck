@@ -60,14 +60,14 @@ main_step :: proc(game_state: ^Game_State) {
 
     // Camera
     camera := &game_state.graphics.camera
-    camera_step(camera, game_state)
+    camera_step(camera, &game_state.world)
 
     // Hand
-    hand_step(&game_state.hand)
+    hand_step(&game_state.hand, camera)
 
     // Select entity
     if rl.IsMouseButtonPressed(.LEFT) {
-        mouse_position := camera_get_mouse_world_position(camera)
+        mouse_position := camera_world_mouse_position(camera)
         entity_id, ok := world_get_entity(
             &game_state.world, mouse_position).(int)
         if (ok) {
@@ -79,12 +79,11 @@ main_step :: proc(game_state: ^Game_State) {
 }
 
 main_draw :: proc(game_state: ^Game_State) {
+    camera := &game_state.graphics.camera
     
     // Draw onto texture
     rl.BeginTextureMode(game_state.graphics.surface);
     {
-        camera := &game_state.graphics.camera
-
         // Background
         rl.ClearBackground({0, 0, 0, 255})
         for x in 0 ..= SURFACE_WIDTH / GRID_SIZE {
@@ -109,7 +108,7 @@ main_draw :: proc(game_state: ^Game_State) {
         // Selected entity
         selected_id, ok := game_state.selected_id.(int)
         if ok {
-            mouse_position := camera_get_mouse_position(camera)
+            mouse_position := camera_surface_mouse_position(camera)
             entity := game_state.world.entities[selected_id]
             rl.DrawLineV(
                 (f_vec_2(entity.position) - camera.position) * GRID_SIZE, 
@@ -123,24 +122,18 @@ main_draw :: proc(game_state: ^Game_State) {
     rl.BeginDrawing()
     {
         rl.ClearBackground(rl.GRAY)
-
         texture := game_state.graphics.surface.texture
-        screen_width := f32(rl.GetScreenWidth())
-        screen_height := f32(rl.GetScreenHeight())
-        surface_width := f32(SURFACE_WIDTH)
-        surface_height := f32(SURFACE_HEIGHT)
-        scale := min(
-            screen_width / surface_width, 
-            screen_height / surface_height)
+        scale := camera_surface_scale(camera)
+        surface_origin := camera_surface_origin(camera)
 
         rl.DrawTexturePro(
             texture, 
             { 0.0, 0.0, f32(texture.width), - f32(texture.height) },
-            { 
-                (screen_width - surface_width*scale)*0.5, 
-                (screen_height - surface_height*scale)*0.5,
-                surface_width*scale, 
-                surface_height*scale,
+            {
+                surface_origin.x,
+                surface_origin.y,
+                f32(SURFACE_WIDTH)*scale, 
+                f32(SURFACE_HEIGHT)*scale,
             }, 
             { 0, 0 }, 0.0, rl.WHITE);
         
@@ -148,7 +141,7 @@ main_draw :: proc(game_state: ^Game_State) {
         rl.DrawText(fps, 16, 16, 16, rl.WHITE)
 
         // GUI
-        hand_draw_to_screen(&game_state.hand)
+        hand_draw_to_screen(&game_state.hand, camera)
     }
     rl.EndDrawing()
 }
