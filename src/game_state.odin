@@ -17,7 +17,6 @@ Game_State :: struct {
     deck: Deck,
     phase: Game_Phase,
     player_id: int,
-    selected_id: Maybe(int),
 }
 
 @(private="file")

@@ -65,18 +65,6 @@ main_step :: proc(game_state: ^Game_State) {
 
     // Hand
     hand_step(&game_state.hand, &game_state.deck, &game_state.world, camera)
-
-    // Select entity
-    if rl.IsMouseButtonPressed(.LEFT) {
-        mouse_position := camera_world_mouse_position(camera)
-        entity_id, ok := world_get_entity(
-            &game_state.world, mouse_position).(int)
-        if (ok) {
-            game_state.selected_id = entity_id
-        } else {
-            game_state.selected_id = nil
-        }
-    }
 }
 
 main_draw :: proc(game_state: ^Game_State) {
@@ -104,17 +92,6 @@ main_draw :: proc(game_state: ^Game_State) {
 
             entity := &game_state.world.entities[entity_id]
             entity_draw(entity)
-        }
-
-        // Selected entity
-        selected_id, ok := game_state.selected_id.(int)
-        if ok {
-            mouse_position := camera_surface_mouse_position(camera)
-            entity := game_state.world.entities[selected_id]
-            rl.DrawLineV(
-                (f_vec_2(entity.position) - camera.position) * GRID_SIZE, 
-                mouse_position, 
-                rl.WHITE)
         }
     }
     rl.EndTextureMode()
