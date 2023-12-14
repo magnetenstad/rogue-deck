@@ -43,10 +43,9 @@ game_state_create :: proc() -> Game_State {
     }
 
     // Deck
-    for i in 0 ..< 100 {
+    for i in 0 ..< 10 {
         card := Card {
-            name = "Test",
-            cost = i,
+            name = "Skeleton",
             play = proc(world: ^World, position: IVec2) -> bool { 
                 world_add_entity(world, 
                     Entity{kind=.enemy, sprite_id=.skeleton, position=position})
@@ -55,6 +54,19 @@ game_state_create :: proc() -> Game_State {
         }
         append(&game_state.deck.cards, card)
     }
+    for i in 0 ..< 10 {
+        card := Card {
+            name = "Teleport",
+            play = proc(world: ^World, position: IVec2) -> bool { 
+                state := get_game_state()
+                player := &state.world.entities[state.player_id]
+                player.position = position
+                return true
+            },
+        }
+        append(&game_state.deck.cards, card)
+    }
+    deck_shuffle(&game_state.deck)
 
     // Hand
     game_state.hand.max_size = 10

@@ -133,7 +133,7 @@ hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck,
     
     ordered_remove(&hand.cards, index)
     append(&deck.cards, card.card)
-    rand.shuffle(deck.cards[:])
+    deck_shuffle(deck)
     return true
 }
 
@@ -207,4 +207,8 @@ card_get_rect :: proc(card: ^PhysicalCard) -> rl.Rectangle {
         width = width, 
         height = height, 
     }
+}
+
+deck_shuffle :: proc(deck: ^Deck) {
+    rand.shuffle(deck.cards[:])
 }
