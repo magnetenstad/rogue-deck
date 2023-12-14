@@ -2,8 +2,6 @@
 package main
 
 import rl "vendor:raylib"
-import "core:fmt"
-import "core:strings"
 import "core:os"
 
 @(private="file")
@@ -115,7 +113,7 @@ main_draw :: proc(game_state: ^Game_State) {
             }, 
             { 0, 0 }, 0.0, rl.WHITE)
         
-        fps := strings.clone_to_cstring(fmt.tprint(rl.GetFPS()))
+        fps := cstr(format(rl.GetFPS()))
         rl.DrawText(fps, 16, 16, 16, rl.WHITE)
 
         // GUI
