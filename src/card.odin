@@ -33,11 +33,7 @@ Hand :: struct {
 }
 
 hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
-    margin :: 32
-    origin := f_vec_2(rl.GetScreenWidth(), rl.GetScreenHeight())
-    origin.x /= 2
-    origin.y -= CARD_HEIGHT / 2 + margin
-    width := f32(len(hand.cards) * (CARD_WIDTH + margin))
+    gui_size := camera_gui_size()
     sorted_indices := sort_indices_by(
         hand.cards[:], 
         proc(a: PhysicalCard, b: PhysicalCard) -> bool { 
@@ -48,12 +44,10 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
     mouse_gui_position := rl.GetMousePosition()
 
     for i in sorted_indices {
+        if is_hovering && hover_index == i do continue
+
         card := &hand.cards[i]
-        offset := FVec2 { 
-            f32(i) * (CARD_WIDTH + margin) - width / 2, 
-            0,
-        }
-        card.target_position = origin + offset
+        card.target_position = _card_position(i, len(hand.cards))
         card.target_scale = 1
         card.z_index = 0
         
@@ -65,29 +59,48 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
     
     if is_hovering {
         card := &hand.cards[hover_index]
-        card.target_scale = 2
         card.z_index = 1
-        card.target_position.y -= CARD_HEIGHT / 2
-        card_rect := card_get_rect(card)
+
+        if !hand.hover_is_selected {
+            card.target_scale = 2
+            card.target_position = 
+                _card_position(hover_index, len(hand.cards)) + 
+                FVec2 { 0, - CARD_HEIGHT / 2}
+        }
 
         if rl.IsMouseButtonPressed(.LEFT) {
             hand.hover_is_selected = true
         }
+        if rl.IsMouseButtonPressed(.RIGHT) {
+            _hand_unhover(hand)
+        }
+
+        card_rect := card_get_rect(card)
+        mouse_in_rect := point_in_rect(mouse_gui_position, &card_rect)
         
         if hand.hover_is_selected {
+            card.target_scale = 2
+            card.target_position.y = gui_size.y / 2
+            if mouse_in_rect {
+                if mouse_gui_position.x > gui_size.x / 2 {
+                    card.target_position.x = gui_size.x / 5
+                } else {
+                    card.target_position.x = gui_size.x - gui_size.x / 5
+                }
+            }
+
             mouse_world_position := camera_world_mouse_position(camera)
             hand.hover_target = mouse_world_position
 
             if rl.IsMouseButtonReleased(.LEFT) {
-                hand_play(hand, hover_index, deck, world, mouse_world_position)
-                hand.hover_index = nil
-                hand.hover_target = nil
-                hand.hover_is_selected = false
+                if camera_mouse_in_surface(camera) {
+                    hand_play(hand, hover_index, 
+                        deck, world, mouse_world_position)
+                }
+                _hand_unhover(hand)
             }
-        } else if !point_in_rect(mouse_gui_position, &card_rect) {
-            hand.hover_index = nil
-            hand.hover_target = nil
-            hand.hover_is_selected = false
+        } else if !mouse_in_rect {
+            _hand_unhover(hand)
         }
     }
 
@@ -96,6 +109,21 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
             card.position, card.target_position, 0.1)
         card.scale = move_towards(card.scale, card.target_scale, 0.2)
     }
+}
+
+_hand_unhover :: proc(hand: ^Hand) {
+    hand.hover_index = nil
+    hand.hover_target = nil
+    hand.hover_is_selected = false
+}
+
+_card_position :: proc(i: int, n: int) -> FVec2 {
+    margin :: 32
+    gui_size := camera_gui_size()
+    origin := FVec2 { gui_size.x / 2, gui_size.y - CARD_HEIGHT / 2 - margin }
+    width := f32(n) * (CARD_WIDTH + margin)
+    offset := FVec2 { f32(i) * (CARD_WIDTH + margin) - width / 2, 0 }
+    return origin + offset
 }
 
 hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck, 
@@ -141,8 +169,8 @@ hand_draw_to_screen :: proc(hand: ^Hand, camera: ^Camera) {
 }
 
 card_is_playable_at :: proc(card: ^Card, 
-        world: ^World, position: IVec2) -> bool {
-    // TODO
+        world: ^World, position: IVec2) -> (playable: bool) {
+    world_empty(world, position) or_return
     return true
 }
 

@@ -113,3 +113,8 @@ world_get_entity :: proc(world: ^World,
     }
     return nil
 }
+
+world_empty :: proc(world: ^World, world_position: IVec2) -> bool {
+    _, not_empty := world_get_entity(world, world_position).(int)
+    return !not_empty
+}

@@ -28,12 +28,13 @@ Serializable_Game_State :: struct {
 
 game_state_create :: proc() -> Game_State {
     game_state := Game_State{}
+    rng := rand.create(0)
     
     game_state.player_id = world_add_entity(&game_state.world, 
-        Entity{kind=.player, sprite_id=.player, position={2, 2}})
+        Entity{kind=.player, sprite_id=.player, position={8, 8}})
 
-    rng := rand.create(0)
-    for i in 0 ..< 100 {
+    // World
+    for i in 0 ..< 16 {
         position := i_vec_2( 
             math.floor(rand.float32(&rng) * SURFACE_WIDTH / GRID_SIZE), 
             math.floor(rand.float32(&rng) * SURFACE_HEIGHT / GRID_SIZE), 
@@ -41,6 +42,8 @@ game_state_create :: proc() -> Game_State {
         world_add_entity(&game_state.world, 
             Entity{kind=.enemy, sprite_id=.skeleton, position=position})
     }
+
+    // Deck
     for i in 0 ..< 100 {
         card := Card {
             name = "Test",
@@ -53,6 +56,8 @@ game_state_create :: proc() -> Game_State {
         }
         append(&game_state.deck.cards, card)
     }
+
+    // Hand
     game_state.hand.max_size = 10
     for _ in 0 ..< 9 {
         hand_draw_from_deck(&game_state.hand, &game_state.deck)

@@ -31,6 +31,14 @@ camera_surface_mouse_position :: proc(camera: ^Camera) -> FVec2 {
     return camera_gui_mouse_position(camera) / scale
 }
 
+camera_world_mouse_position :: proc(camera: ^Camera) -> IVec2 {
+    return camera_gui_to_world(camera, camera_gui_mouse_position(camera))
+}
+
+camera_gui_size :: proc() -> FVec2 {
+    return f_vec_2(rl.GetScreenWidth(), rl.GetScreenHeight())
+}
+
 camera_surface_scale :: proc(camera: ^Camera) -> f32 {
     screen_width := f32(rl.GetScreenWidth())
     screen_height := f32(rl.GetScreenHeight())
@@ -54,10 +62,6 @@ camera_surface_origin :: proc(camera: ^Camera) -> FVec2 {
     }
 }
 
-camera_world_mouse_position :: proc(camera: ^Camera) -> IVec2 {
-    return camera_gui_to_world(camera, camera_gui_mouse_position(camera))
-}
-
 camera_world_to_surface :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
     return (f_vec_2(position) - camera.position) * GRID_SIZE
 }
@@ -71,4 +75,10 @@ camera_world_to_gui :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
     scale := camera_surface_scale(camera)
     origin := camera_surface_origin(camera)
     return origin + camera_world_to_surface(camera, position) * scale
+}
+
+camera_mouse_in_surface :: proc(camera: ^Camera) -> bool {
+    mouse_surface_position := camera_surface_mouse_position(camera)
+    return point_in_rect(mouse_surface_position, 
+        &rl.Rectangle { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT })
 }
