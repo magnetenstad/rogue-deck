@@ -33,7 +33,6 @@ Hand :: struct {
 }
 
 hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
-    gui_size := camera_gui_size()
     sorted_indices := sort_indices_by(
         hand.cards[:], 
         proc(a: PhysicalCard, b: PhysicalCard) -> bool { 
@@ -80,13 +79,12 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
         
         if hand.hover_is_selected {
             card.target_scale = 2
-            card.target_position.y = gui_size.y / 2
-            if mouse_in_rect {
-                if mouse_gui_position.x > gui_size.x / 2 {
-                    card.target_position.x = gui_size.x / 5
-                } else {
-                    card.target_position.x = gui_size.x - gui_size.x / 5
-                }
+
+            if camera_mouse_in_surface(camera) {
+                card.target_position = mouse_gui_position +
+                    FVec2 { CARD_WIDTH * 2, CARD_HEIGHT / 2 }
+            } else {
+                card.target_position = mouse_gui_position
             }
 
             mouse_world_position := camera_world_mouse_position(camera)
@@ -159,12 +157,19 @@ hand_draw_to_screen :: proc(hand: ^Hand, camera: ^Camera) {
         card_draw_to_screen(&hand.cards[i])
     }
 
-    hover_index, is_hovering := hand.hover_index.(int)
+    _, is_hovering := hand.hover_index.(int)
     hover_target, is_targeting := hand.hover_target.(IVec2)
     if is_hovering && is_targeting {
-        card := hand.cards[hover_index]
-        rl.DrawLineV(card.position, 
-            camera_world_to_gui(camera, hover_target), rl.WHITE)
+        gui_position := camera_world_to_gui(camera, hover_target)
+        scale := camera_surface_scale(camera)
+        rl.DrawRectangleRoundedLines(
+            rl.Rectangle {
+                gui_position.x,
+                gui_position.y,
+                GRID_SIZE * scale,
+                GRID_SIZE * scale,
+            }, 
+            0.1, 16, 4, rl.WHITE)
     }
 }
 
