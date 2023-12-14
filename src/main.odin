@@ -64,7 +64,7 @@ main_step :: proc(game_state: ^Game_State) {
     camera_step(camera, &game_state.world)
 
     // Hand
-    hand_step(&game_state.hand, camera)
+    hand_step(&game_state.hand, &game_state.deck, &game_state.world, camera)
 
     // Select entity
     if rl.IsMouseButtonPressed(.LEFT) {

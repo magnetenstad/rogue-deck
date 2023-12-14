@@ -38,15 +38,17 @@ game_state_create :: proc() -> Game_State {
             math.floor(rand.float32(&rng) * SURFACE_WIDTH / GRID_SIZE), 
             math.floor(rand.float32(&rng) * SURFACE_HEIGHT / GRID_SIZE), 
         )
-        world_add_entity(&game_state.world, Entity{kind=.enemy, 
-            sprite_id=.skeleton, position=position})
+        world_add_entity(&game_state.world, 
+            Entity{kind=.enemy, sprite_id=.skeleton, position=position})
     }
     for i in 0 ..< 100 {
         card := Card {
             name = "Test",
             cost = i,
-            play = proc(b: IVec2, a: ^World) -> bool { 
-                return true 
+            play = proc(world: ^World, position: IVec2) -> bool { 
+                world_add_entity(world, 
+                    Entity{kind=.enemy, sprite_id=.skeleton, position=position})
+                return true
             },
         }
         append(&game_state.deck.cards, card)

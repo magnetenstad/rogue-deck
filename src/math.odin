@@ -1,5 +1,5 @@
-package main
 //+vet unused shadowing using-stmt style semicolon
+package main
 
 import "core:math"
 import "core:math/linalg"
@@ -27,11 +27,11 @@ f_vec_2 :: proc{
 }
 
 i_vec_2_from_f_vec :: proc(fvec: FVec2) -> IVec2 {
-    return IVec2 { int(fvec.x), int(fvec.y) }
+    return IVec2 { int(math.floor(fvec.x)), int(math.floor(fvec.y)) }
 }
 
 i_vec_2_from_f :: proc(x: f32, y: f32) -> IVec2 {
-    return IVec2 { int(x), int(y) }
+    return IVec2 { int(math.floor(x)), int(math.floor(y)) }
 }
 
 i_vec_2 :: proc{

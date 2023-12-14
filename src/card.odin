@@ -8,7 +8,7 @@ Card :: struct {
     name: string,
     cost: int,
     attack: int,
-    play: proc(IVec2, ^World) -> bool,
+    play: proc(^World, IVec2) -> bool,
 }
 
 PhysicalCard :: struct {
@@ -28,10 +28,11 @@ Hand :: struct {
     cards: [dynamic]PhysicalCard,
     max_size: int,
     hover_index: Maybe(int),
-    target_position: Maybe(IVec2),
+    hover_target: Maybe(IVec2),
+    hover_is_selected: bool,
 }
 
-hand_step :: proc(hand: ^Hand, camera: ^Camera) {
+hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
     margin :: 32
     origin := f_vec_2(rl.GetScreenWidth(), rl.GetScreenHeight())
     origin.x /= 2
@@ -43,42 +44,51 @@ hand_step :: proc(hand: ^Hand, camera: ^Camera) {
             return a.z_index > b.z_index 
         },
     )
+    hover_index, is_hovering := hand.hover_index.(int)
+    mouse_gui_position := rl.GetMousePosition()
 
     for i in sorted_indices {
         card := &hand.cards[i]
-        hover_index, is_hovering := hand.hover_index.(int)
-        
-        // Targets
         offset := FVec2 { 
             f32(i) * (CARD_WIDTH + margin) - width / 2, 
             0,
         }
         card.target_position = origin + offset
+        card.target_scale = 1
+        card.z_index = 0
         
-        mouse_position := rl.GetMousePosition()
         card_rect := card_get_rect(card)
-
-        if !is_hovering && point_in_rect(mouse_position, &card_rect) {
+        if !is_hovering && point_in_rect(mouse_gui_position, &card_rect) {
             hand.hover_index = i
         }
+    }
+    
+    if is_hovering {
+        card := &hand.cards[hover_index]
+        card.target_scale = 2
+        card.z_index = 1
+        card.target_position.y -= CARD_HEIGHT / 2
+        card_rect := card_get_rect(card)
 
-        if is_hovering && hover_index == i {
-            card.target_scale = 2
-            card.z_index = 1
-            card.target_position.y -= CARD_HEIGHT / 2
-
-            if rl.IsMouseButtonDown(.LEFT) {
-                hand.target_position = camera_world_mouse_position(camera)
-            } else if !point_in_rect(mouse_position, &card_rect) {
-                hand.hover_index = nil
-                hand.target_position = nil
-            }
-        } else {
-            card.target_scale = 1
-            card.z_index = 0
+        if rl.IsMouseButtonPressed(.LEFT) {
+            hand.hover_is_selected = true
         }
+        
+        if hand.hover_is_selected {
+            mouse_world_position := camera_world_mouse_position(camera)
+            hand.hover_target = mouse_world_position
 
-        // Move towards targets
+            if rl.IsMouseButtonReleased(.LEFT) {
+                hand_play(hand, hover_index, deck, world, mouse_world_position)
+                hand.hover_is_selected = false
+            }
+        } else if !point_in_rect(mouse_gui_position, &card_rect) {
+            hand.hover_index = nil
+            hand.hover_target = nil
+        }
+    }
+
+    for &card in hand.cards {
         card.position = move_towards(
             card.position, card.target_position, 0.1)
         card.scale = move_towards(card.scale, card.target_scale, 0.2)
@@ -119,11 +129,11 @@ hand_draw_to_screen :: proc(hand: ^Hand, camera: ^Camera) {
     }
 
     hover_index, is_hovering := hand.hover_index.(int)
-    target_position, is_targeting := hand.target_position.(IVec2)
+    hover_target, is_targeting := hand.hover_target.(IVec2)
     if is_hovering && is_targeting {
         card := hand.cards[hover_index]
         rl.DrawLineV(card.position, 
-            camera_world_to_gui(camera, target_position), rl.WHITE)
+            camera_world_to_gui(camera, hover_target), rl.WHITE)
     }
 }
 
@@ -137,7 +147,7 @@ card_is_playable_at :: proc(card: ^Card,
 card_play :: proc (card: ^Card, 
         world: ^World, position: IVec2) -> bool {
     if !card_is_playable_at(card, world, position) do return false
-    card.play(position, world)
+    card.play(world, position)
     return true
 }
 
