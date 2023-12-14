@@ -78,8 +78,8 @@ point_in_rect :: proc(point: FVec2, rect: ^rl.Rectangle) -> bool {
 
 sort_indices_by :: proc(data: $T/[]$E, less: proc(i, j: E) -> bool) -> []int {
 	indices := make([]int, len(data))
-	for i in 0 ..< len(data) {
-        indices[i] = -1
+	for &i in indices {
+        i = -1
     }
     for i in 0 ..< len(data) {
         a_i := i
