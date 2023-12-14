@@ -80,11 +80,14 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
 
             if rl.IsMouseButtonReleased(.LEFT) {
                 hand_play(hand, hover_index, deck, world, mouse_world_position)
+                hand.hover_index = nil
+                hand.hover_target = nil
                 hand.hover_is_selected = false
             }
         } else if !point_in_rect(mouse_gui_position, &card_rect) {
             hand.hover_index = nil
             hand.hover_target = nil
+            hand.hover_is_selected = false
         }
     }
 
