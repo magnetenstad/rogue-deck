@@ -191,6 +191,11 @@ card_draw_to_screen :: proc(card: ^PhysicalCard) {
     rect := card_get_rect(card)
     rl.DrawRectangleRounded(rect, 0.2, 8, rl.WHITE)
     rl.DrawRectangleRoundedLines(rect, 0.2, 8, 8, rl.BLACK)
+    rl.DrawText(
+        cstr(card.card.name), 
+        i32(rect.x + rect.width * 0.1),
+        i32(rect.y + rect.height / 2),
+        i32(16 * card.scale), rl.BLACK)
 }
 
 card_get_rect :: proc(card: ^PhysicalCard) -> rl.Rectangle {
