@@ -1,9 +1,8 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
-import rl "vendor:raylib"
-
 DEV :: true
-DESKTOP :: true
+DESKTOP :: false
 
 LOAD_SAVE :: false
 

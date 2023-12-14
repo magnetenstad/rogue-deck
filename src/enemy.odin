@@ -1,6 +1,6 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
-import rl "vendor:raylib"
 import "core:math/rand"
 
 Enemy_Move :: enum {

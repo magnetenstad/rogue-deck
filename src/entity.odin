@@ -1,8 +1,7 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
 import rl "vendor:raylib"
-import "core:math"
-import "core:math/linalg"
 
 Entity_Kind :: enum {
     player,
@@ -24,7 +23,7 @@ entity_step :: proc(entity: ^Entity) {
     entity.draw_position = move_towards(
         entity.draw_position, f_vec_2(entity.position), 0.25)
         
-    chunk_validate(&game_state.world, entity.id)
+    chunk_validate(&game_state.world, entity)
 }
 
 entity_draw :: proc(entity: ^Entity) {

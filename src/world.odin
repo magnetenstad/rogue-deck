@@ -1,7 +1,6 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
-import rl "vendor:raylib"
-import "core:fmt"
 import "core:math"
 
 World :: struct {
@@ -10,7 +9,7 @@ World :: struct {
 }
 
 Chunk :: struct {
-    entity_ids: [dynamic]int
+    entity_ids: [dynamic]int,
 }
 
 world_to_chunk_entity :: proc(entity: ^Entity) -> IVec2 {
@@ -52,7 +51,7 @@ chunk_add_entity :: proc(world: ^World, entity_id: int) {
 
     if chunk_position not_in world.chunks {
         world.chunks[chunk_position] = Chunk{}
-        fmt.println(chunk_position)
+        print(chunk_position)
     }
     chunk := &world.chunks[chunk_position]
     append(&chunk.entity_ids, entity.id)
@@ -71,7 +70,7 @@ world_get_entities_around :: proc(world: ^World,
     for x := -X; x <= X; x += 1 {
         for y := -Y; y <= Y; y += 1 {
             chunk_position := chunk_center + { x, y }
-            if chunk_position not_in world.chunks do continue;
+            if chunk_position not_in world.chunks do continue
 
             chunk := world.chunks[chunk_position]
             append(&entity_ids, ..chunk.entity_ids[:])
@@ -81,8 +80,7 @@ world_get_entities_around :: proc(world: ^World,
     return entity_ids
 }
 
-chunk_validate :: proc(world: ^World, entity_id: int) {
-    entity := &world.entities[entity_id]
+chunk_validate :: proc(world: ^World, entity: ^Entity) {
     
     chunk_position := world_to_chunk(entity)
     if entity.chunk == chunk_position do return
@@ -99,14 +97,14 @@ chunk_validate :: proc(world: ^World, entity_id: int) {
     }
     assert(removed)
 
-    chunk_add_entity(world, entity_id)
+    chunk_add_entity(world, entity.id)
 }
 
 world_get_entity :: proc(world: ^World, 
         world_position: IVec2) -> Maybe(int) {
 
     chunk_position := world_to_chunk(world_position)
-    if chunk_position not_in world.chunks do return nil;
+    if chunk_position not_in world.chunks do return nil
 
     chunk := world.chunks[chunk_position]
     for entity_id in chunk.entity_ids {

@@ -1,3 +1,4 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
 import rl "vendor:raylib"
@@ -82,13 +83,13 @@ main_draw :: proc(game_state: ^Game_State) {
     camera := &game_state.graphics.camera
     
     // Draw onto texture
-    rl.BeginTextureMode(game_state.graphics.surface);
+    rl.BeginTextureMode(game_state.graphics.surface)
     {
         // Background
         rl.ClearBackground({0, 0, 0, 255})
         for x in 0 ..= SURFACE_WIDTH / GRID_SIZE {
             for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
-                if ((x % 2) + (y % 2)) != 1 do continue;
+                if ((x % 2) + (y % 2)) != 1 do continue
                 rl.DrawRectangleV(
                     (f_vec_2(x, y) - camera.position) * GRID_SIZE,
                     {GRID_SIZE, GRID_SIZE},
@@ -116,7 +117,7 @@ main_draw :: proc(game_state: ^Game_State) {
                 rl.WHITE)
         }
     }
-    rl.EndTextureMode();
+    rl.EndTextureMode()
 
     // Draw texture onto screen
     rl.BeginDrawing()
@@ -135,7 +136,7 @@ main_draw :: proc(game_state: ^Game_State) {
                 f32(SURFACE_WIDTH)*scale, 
                 f32(SURFACE_HEIGHT)*scale,
             }, 
-            { 0, 0 }, 0.0, rl.WHITE);
+            { 0, 0 }, 0.0, rl.WHITE)
         
         fps := strings.clone_to_cstring(fmt.tprint(rl.GetFPS()))
         rl.DrawText(fps, 16, 16, 16, rl.WHITE)

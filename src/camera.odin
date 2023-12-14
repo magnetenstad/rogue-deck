@@ -1,8 +1,7 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
 import rl "vendor:raylib"
-import "core:math/linalg"
-import "core:fmt"
 
 Camera :: struct {
     position: FVec2,

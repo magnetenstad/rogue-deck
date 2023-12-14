@@ -1,3 +1,4 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
 import rl "vendor:raylib"
@@ -8,7 +9,7 @@ ASSETS_PATH :: "./assets/"
 Graphics :: struct {
     sprites: map[Sprite_Id]rl.Texture,
     surface: rl.RenderTexture2D,
-    camera: Camera
+    camera: Camera,
 }
 
 Sprite_Id :: enum {
@@ -44,9 +45,9 @@ graphics_create :: proc(game_state: ^Game_State) {
     game_state.graphics.sprites = load_sprites()
 
     game_state.graphics.surface = 
-        rl.LoadRenderTexture(SURFACE_WIDTH, SURFACE_HEIGHT);
+        rl.LoadRenderTexture(SURFACE_WIDTH, SURFACE_HEIGHT)
     rl.SetTextureFilter(game_state.graphics.surface.texture, 
-        rl.TextureFilter.POINT);
+        rl.TextureFilter.POINT)
 
     game_state.graphics.camera.target_id = game_state.player_id
     game_state.graphics.camera.view_size = {

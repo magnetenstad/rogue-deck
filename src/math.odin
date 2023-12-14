@@ -1,9 +1,9 @@
 package main
+//+vet unused shadowing using-stmt style semicolon
 
-import "core:fmt"
 import "core:math"
 import "core:math/linalg"
-import "core:slice"
+import "core:fmt"
 import rl "vendor:raylib"
 
 mround :: proc(value: f32, multiple: f32) -> f32 {
@@ -97,4 +97,8 @@ sort_indices_by :: proc(data: $T/[]$E, less: proc(i, j: E) -> bool) -> []int {
         }
     }
     return indices
+}
+
+print :: proc(args: ..any, sep := " ", flush := true) {
+    fmt.println(args, sep = sep, flush = flush)
 }

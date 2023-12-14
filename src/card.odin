@@ -1,14 +1,14 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
-import "core:fmt"
-import "core:sort"
-import "core:slice"
 import "core:math/rand"
 import rl "vendor:raylib"
 
 Card :: struct {
     name: string,
     cost: int,
+    attack: int,
+    play: proc(IVec2, ^World) -> bool,
 }
 
 PhysicalCard :: struct {
@@ -137,7 +137,7 @@ card_is_playable_at :: proc(card: ^Card,
 card_play :: proc (card: ^Card, 
         world: ^World, position: IVec2) -> bool {
     if !card_is_playable_at(card, world, position) do return false
-    // TODO
+    card.play(position, world)
     return true
 }
 

@@ -1,8 +1,8 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
 import rl "vendor:raylib"
 import "core:time"
-import "core:fmt"
 import "core:slice"
 
 time_last_input := time.now()

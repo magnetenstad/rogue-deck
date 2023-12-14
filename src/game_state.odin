@@ -1,11 +1,9 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
-import rl "vendor:raylib"
 import "core:math"
 import "core:math/rand"
-import "core:fmt"
 import "core:encoding/json"
-import "core:io"
 
 Game_Phase :: enum {
     turn_player,
@@ -47,11 +45,14 @@ game_state_create :: proc() -> Game_State {
         card := Card {
             name = "Test",
             cost = i,
+            play = proc(b: IVec2, a: ^World) -> bool { 
+                return true 
+            },
         }
         append(&game_state.deck.cards, card)
     }
     game_state.hand.max_size = 10
-    for i in 0 ..< 9 {
+    for _ in 0 ..< 9 {
         hand_draw_from_deck(&game_state.hand, &game_state.deck)
     }
 
@@ -75,7 +76,7 @@ game_state_deserialize :: proc(data: []byte) -> Game_State {
     game_state := Game_State{}
     game_state.world.entities = serializable.entities
     game_state.player_id = serializable.player_id
-    for &entity in game_state.world.entities {
+    for entity in game_state.world.entities {
         chunk_add_entity(&game_state.world, entity.id)
     }
 
