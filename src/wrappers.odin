@@ -1,3 +1,4 @@
+//+vet unused shadowing using-stmt style semicolon
 package main
 
 import "core:fmt"
@@ -12,5 +13,5 @@ cstr :: proc(str: string) -> cstring {
 }
 
 format :: proc(args: ..any, sep := " ") -> string {
-    return fmt.tprint(args, sep=sep)
+    return fmt.tprint(..args, sep=sep)
 }

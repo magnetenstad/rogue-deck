@@ -89,7 +89,7 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
 
     for &card in hand.cards {
         card.position = move_towards(
-            card.position, card.target_position, 0.1)
+            card.position, card.target_position, 0.2)
         card.scale = move_towards(card.scale, card.target_scale, 0.2)
     }
 }

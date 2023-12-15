@@ -139,12 +139,22 @@ _main_draw :: proc(game_state: ^Game_State) {
             }, 
             { 0, 0 }, 0.0, rl.WHITE)
         
-        fps := cstr(format(rl.GetFPS()))
-        rl.DrawText(fps, 16, 16, 16, rl.WHITE)
+        rl.DrawTextEx(
+            rl.GuiGetFont(), 
+            cstr(format(rl.GetFPS())), 
+            {16, 16}, 
+            32, 0, rl.WHITE)
 
         // GUI
+        for entity_id in world_get_entities_around(
+                &game_state.world, player.position) {
+
+            entity, _ := world_get_entity(&game_state.world, 
+                entity_id).(^Entity)
+            entity_draw_gui(entity)
+        }
+        
         hand_draw_to_screen(&game_state.hand, camera)
     }
     rl.EndDrawing()
 }
- 

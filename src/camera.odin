@@ -90,7 +90,8 @@ camera_gui_to_world :: proc(camera: ^Camera, position: FVec2) -> IVec2 {
     return i_vec_2((position + camera.position) / (GRID_SIZE * scale))
 }
 
-camera_world_to_gui :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
+@(private="file")
+_camera_world_to_gui_f :: proc(camera: ^Camera, position: FVec2) -> FVec2 {
     scale := camera_surface_scale(camera)
     origin := camera_surface_origin(camera)
     surface_position := camera_world_to_surface(camera, position)
@@ -99,4 +100,14 @@ camera_world_to_gui :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
         mfloor(camera.position.y, scale) - camera.position.y,
     }
     return origin + surface_position * scale + subpixel
+}
+
+@(private="file")
+_camera_world_to_gui_i :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
+    return _camera_world_to_gui_f(camera, f_vec_2(position))
+}
+
+camera_world_to_gui :: proc {
+    _camera_world_to_gui_f,
+    _camera_world_to_gui_i,
 }

@@ -15,6 +15,7 @@ Entity :: struct {
     sprite_id: Sprite_Id,
     position: IVec2,
     draw_position: FVec2,
+    health: int,
 }
 
 entity_step :: proc(entity: ^Entity) {
@@ -29,10 +30,23 @@ entity_step :: proc(entity: ^Entity) {
 entity_draw :: proc(entity: ^Entity) {
     graphics := &get_game_state().graphics
     texture := graphics.sprites[entity.sprite_id]
+    surface_position := camera_world_to_surface(
+        &graphics.camera, entity.draw_position)
     rl.DrawTextureEx(texture,
-        camera_world_to_surface(
-            &graphics.camera, entity.draw_position),
+        surface_position,
         0,
         1.0,
         rl.WHITE)
+}
+
+entity_draw_gui :: proc(entity: ^Entity) {
+    graphics := &get_game_state().graphics
+    gui_position := camera_world_to_gui(
+        &graphics.camera, entity.draw_position + {0, -0.2})
+    
+    rl.DrawTextEx(
+        rl.GuiGetFont(), 
+        cstr(format("HP: ", entity.health)), 
+        gui_position, 
+        32, 0, rl.WHITE)
 }
