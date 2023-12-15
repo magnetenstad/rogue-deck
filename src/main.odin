@@ -5,35 +5,37 @@ import rl "vendor:raylib"
 import "core:os"
 
 @(private="file")
-game_state : Game_State
+_game_state : Game_State
 
 get_game_state :: proc() -> ^Game_State {
-    return &game_state
+    return &_game_state
 }
 
+@(private="file")
 main :: proc() {
     // Read save file and create game state
     data_read, ok := os.read_entire_file("saves/data.json")
     if ok && LOAD_SAVE {
-        game_state = game_state_deserialize(data_read)
+        _game_state = game_state_deserialize(data_read)
     } else {
-        game_state = game_state_create()
+        _game_state = game_state_create()
     }
-    graphics_create(&game_state)
+    graphics_create(&_game_state)
 
     // Main loop
     for !rl.WindowShouldClose() {
-        main_step(&game_state)
-        main_draw(&game_state)
+        _main_step(&_game_state)
+        _main_draw(&_game_state)
     }
 
     // Write save file and close
-    data_to_write, _ :=  game_state_serialize(&game_state)
+    data_to_write, _ :=  game_state_serialize(&_game_state)
     os.write_entire_file("saves/data.json", data_to_write)
     rl.CloseWindow()
 }
 
-main_step :: proc(game_state: ^Game_State) {
+@(private="file")
+_main_step :: proc(game_state: ^Game_State) {
     player, _ := world_get_entity(&game_state.world, 
         game_state.player_id).(^Entity)
 
@@ -68,7 +70,8 @@ main_step :: proc(game_state: ^Game_State) {
     hand_step(&game_state.hand, &game_state.deck, &game_state.world, camera)
 }
 
-main_draw :: proc(game_state: ^Game_State) {
+@(private="file")
+_main_draw :: proc(game_state: ^Game_State) {
     camera := &game_state.graphics.camera
     scale := camera_surface_scale(camera)
     

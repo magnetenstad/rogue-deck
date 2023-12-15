@@ -4,15 +4,15 @@ package main
 import "core:math"
 
 World :: struct {
-    chunks: map[IVec2]Chunk,
+    chunks: map[IVec2]_Chunk,
     entities: [dynamic]Entity,
     next_entity_id: int,
 }
 
-Chunk :: struct {
+@(private="file")
+_Chunk :: struct {
     entity_ids: [dynamic]int,
 }
-
 
 world_to_chunk_entity :: proc(entity: ^Entity) -> IVec2 {
     return world_to_chunk_ivec(entity.position)
@@ -61,7 +61,7 @@ chunk_add_entity :: proc(world: ^World, entity_id: int) {
     chunk_position := world_to_chunk(entity.position)
 
     if chunk_position not_in world.chunks {
-        world.chunks[chunk_position] = Chunk{}
+        world.chunks[chunk_position] = _Chunk{}
         print(chunk_position)
     }
     chunk := &world.chunks[chunk_position]

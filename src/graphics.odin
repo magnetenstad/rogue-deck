@@ -42,7 +42,7 @@ graphics_create :: proc(game_state: ^Game_State) {
         rl.SetWindowPosition(1920*2, -256)
     }
 
-    game_state.graphics.sprites = load_sprites()
+    game_state.graphics.sprites = _load_sprites()
 
     game_state.graphics.surface = 
         rl.LoadRenderTexture(SURFACE_WIDTH, SURFACE_HEIGHT)
@@ -57,7 +57,7 @@ graphics_create :: proc(game_state: ^Game_State) {
 }
 
 @(private="file")
-load_sprites :: proc() -> map[Sprite_Id]rl.Texture {
+_load_sprites :: proc() -> map[Sprite_Id]rl.Texture {
     m := make(map[Sprite_Id]rl.Texture)
 
     for sprite_id in Sprite_Id {
