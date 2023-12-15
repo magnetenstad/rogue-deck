@@ -30,7 +30,12 @@ game_state_create :: proc() -> Game_State {
     rng := rand.create(0)
     
     game_state.player_id = world_add_entity(&game_state.world, 
-        Entity{kind=.player, sprite_id=.player, position={8, 8}})
+        Entity{
+            kind = .player, 
+            sprite_id = .player, 
+            position = {8, 8},
+            health = 10,
+        })
 
     // World
     for i in 0 ..< 16 {
@@ -39,7 +44,12 @@ game_state_create :: proc() -> Game_State {
             math.floor(rand.float32(&rng) * SURFACE_HEIGHT / GRID_SIZE), 
         )
         world_add_entity(&game_state.world, 
-            Entity{kind=.enemy, sprite_id=.skeleton, position=position})
+            Entity{
+                kind = .enemy, 
+                sprite_id = .skeleton, 
+                position = position,
+                health = 2,
+            })
     }
 
     // Deck
@@ -55,7 +65,7 @@ game_state_create :: proc() -> Game_State {
     }
    
     // Hand
-    game_state.hand.max_size = 10
+    game_state.hand.cards_max = 10
     for _ in 0 ..< 9 {
         hand_draw_from_deck(&game_state.hand, &game_state.deck)
     }

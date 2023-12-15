@@ -19,7 +19,11 @@ Deck :: struct {
 
 Hand :: struct {
     cards: [dynamic]PhysicalCard,
-    max_size: int,
+    cards_regen: int,
+    cards_max: int,
+    mana: int,
+    mana_regen: int,
+    mana_max: int,
     hover_index: Maybe(int),
     hover_target: Maybe(IVec2),
     hover_is_selected: bool,
@@ -127,7 +131,7 @@ hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck,
 }
 
 hand_draw_from_deck :: proc(hand: ^Hand, deck: ^Deck) -> bool {
-    if len(hand.cards) >= hand.max_size do return false
+    if len(hand.cards) >= hand.cards_max do return false
     if len(deck.cards) == 0 do return false
 
     card := pop(&deck.cards)
@@ -135,7 +139,7 @@ hand_draw_from_deck :: proc(hand: ^Hand, deck: ^Deck) -> bool {
     return true
 }
 
-hand_draw_to_screen :: proc(hand: ^Hand, camera: ^Camera) {
+hand_draw_gui :: proc(hand: ^Hand, camera: ^Camera) {
     sorted_indices := sort_indices_by(
         hand.cards[:], 
         proc(a: PhysicalCard, b: PhysicalCard) -> bool { 
@@ -143,7 +147,7 @@ hand_draw_to_screen :: proc(hand: ^Hand, camera: ^Camera) {
         },
     )
     for i in sorted_indices {
-        card_draw_to_screen(&hand.cards[i])
+        card_draw_gui(&hand.cards[i])
     }
 
     _, is_hovering := hand.hover_index.(int)
@@ -160,6 +164,16 @@ hand_draw_to_screen :: proc(hand: ^Hand, camera: ^Camera) {
             }, 
             0.1, 16, 4, rl.WHITE)
     }
+
+    mana_text := format("Mana: ", 
+        hand.mana, "/", hand.mana_max, 
+        " |+", hand.mana_regen)
+    draw_text(mana_text, {16, 64})
+
+    cards_text := format("Cards: ",
+        len(hand.cards), "/", hand.cards_max,
+        " |+", hand.cards_regen)
+    draw_text(cards_text, {16, 96})
 }
 
 deck_shuffle :: proc(deck: ^Deck) {

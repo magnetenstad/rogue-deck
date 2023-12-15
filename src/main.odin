@@ -150,7 +150,11 @@ _main_draw :: proc(game_state: ^Game_State) {
             entity_draw_gui(entity)
         }
         
-        hand_draw_to_screen(&game_state.hand, camera)
+        hand_draw_gui(&game_state.hand, camera)
+
+        gui_button("End Turn", {64, 256}, proc() {
+            print("End turn!")
+        }, 2)
     }
     rl.EndDrawing()
 }

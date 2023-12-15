@@ -16,7 +16,7 @@ Card :: struct {
     range: int,
 }
 
-card_draw_to_screen :: proc(card: ^PhysicalCard) {
+card_draw_gui :: proc(card: ^PhysicalCard) {
     rect := card_get_rect(card)
     rl.DrawRectangleRounded(rect, 0.2, 8, rl.WHITE)
     rl.DrawRectangleRoundedLines(rect, 0.2, 8, 8, rl.BLACK)
@@ -25,7 +25,7 @@ card_draw_to_screen :: proc(card: ^PhysicalCard) {
         rect.y + rect.height / 2,
     }
     draw_text(card.card.name, text_position, 
-        scale = 24 * card.scale, 
+        size = 24 * card.scale, 
         color = rl.BLACK, 
         font = .nova_square_regular)
 }
@@ -69,7 +69,10 @@ card_get :: proc(card_id: Card_Id) -> Card {
                     entity, hit := world_get_entity(world, position).(^Entity)
                     if hit {
                         (entity.id != get_game_state().player_id) or_return
-                        world_remove_entity(world, entity)
+                        entity.health -= 1
+                        if entity.health <= 0 {
+                            world_remove_entity(world, entity)
+                        }
                     } 
                     return hit
                 },
