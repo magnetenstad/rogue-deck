@@ -56,9 +56,10 @@ game_state_create :: proc() -> Game_State {
     card_ids: []Card_Id = { 
         .skeleton,
         .teleport,
-        .dagger, 
+        .dagger,
+        .fire_ball,
     }
-    for i in 0 ..< 100 {
+    for _ in 0 ..< 100 {
         card_id := rand.choice(card_ids)
         card := card_get(card_id)
         append(&game_state.deck.cards, card)
@@ -66,9 +67,10 @@ game_state_create :: proc() -> Game_State {
    
     // Hand
     game_state.hand.cards_max = 10
-    for _ in 0 ..< 9 {
-        hand_draw_from_deck(&game_state.hand, &game_state.deck)
-    }
+    game_state.hand.cards_regen = 2
+    game_state.hand.mana_max = 10
+    game_state.hand.mana_regen = 2
+    end_turn(&game_state)
 
     return game_state
 }

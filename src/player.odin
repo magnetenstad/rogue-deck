@@ -24,8 +24,6 @@ player_step :: proc(player: ^Entity) {
             case .S: { player.position.y += 1 }
             case .D: { player.position.x += 1 }
         }
-
-        game_state.phase = .turn_enemy
         _time_last_input = time_now
     }
 }

@@ -109,9 +109,11 @@ _main_draw :: proc(game_state: ^Game_State) {
         card_index, is_hovering := game_state.hand.hover_index.(int)
         if is_hovering {
             card := &game_state.hand.cards[card_index]
-            rect := camera_world_to_surface(camera, 
-                card_get_range_rect(&card.card))
-            rl.DrawRectangleLinesEx(rect, 1, rl.WHITE)
+            world_rect := card_get_range_rect(&card.card)  
+            world_rect.width += 1
+            world_rect.height += 1
+            surface_rect := camera_world_to_surface(camera, world_rect)
+            rl.DrawRectangleLinesEx(surface_rect, 1, rl.WHITE)
         }
     }
     rl.EndTextureMode()
@@ -153,8 +155,19 @@ _main_draw :: proc(game_state: ^Game_State) {
         hand_draw_gui(&game_state.hand, camera)
 
         gui_button("End Turn", {64, 256}, proc() {
-            print("End turn!")
+            end_turn(get_game_state())
         }, 2)
     }
     rl.EndDrawing()
+}
+
+end_turn :: proc(game_state: ^Game_State) {
+    for _ in 0 ..< game_state.hand.cards_regen {
+        hand_draw_from_deck(&game_state.hand, &game_state.deck)
+    }
+    for _ in 0 ..< game_state.hand.mana_regen {
+        game_state.hand.mana = min(
+            game_state.hand.mana_max, game_state.hand.mana + 1)
+    }
+    game_state.phase = .turn_enemy
 }

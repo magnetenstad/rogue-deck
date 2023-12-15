@@ -120,10 +120,12 @@ hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck,
     if index >= len(hand.cards) do return false
 
     card := hand.cards[index]
+    if card.card.cost > hand.mana do return false
     rect := card_get_range_rect(&card.card)
     if !point_in_rect(position, &rect) do return false
     if !card.card.play(world, position) do return false
     
+    hand.mana -= card.card.cost
     ordered_remove(&hand.cards, index)
     append(&deck.cards, card.card)
     deck_shuffle(deck)
@@ -168,7 +170,7 @@ hand_draw_gui :: proc(hand: ^Hand, camera: ^Camera) {
     mana_text := format("Mana: ", 
         hand.mana, "/", hand.mana_max, 
         " |+", hand.mana_regen)
-    draw_text(mana_text, {16, 64})
+    draw_text(mana_text, {16, 64}, color = rl.BLUE)
 
     cards_text := format("Cards: ",
         len(hand.cards), "/", hand.cards_max,
