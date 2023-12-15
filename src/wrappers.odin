@@ -17,9 +17,9 @@ format :: proc(args: ..any, sep := " ") -> string {
     return fmt.tprint(..args, sep=sep)
 }
 
-draw_text :: proc(text: string, position: FVec2, scale: f32 = 32, color: rl.Color = rl.WHITE) {
+draw_text :: proc(text: string, position: FVec2, scale: f32 = 32, color: rl.Color = rl.WHITE, font: Font_Id = FONT_DEFAULT) {
     rl.DrawTextEx(
-        rl.GuiGetFont(), 
+        get_game_state().graphics.fonts[font], 
         cstr(text), 
         position, 
         scale, 0, color)

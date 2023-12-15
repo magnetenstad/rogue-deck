@@ -24,7 +24,10 @@ card_draw_to_screen :: proc(card: ^PhysicalCard) {
         rect.x + rect.width * 0.1,
         rect.y + rect.height / 2,
     }
-    draw_text(card.card.name, text_position, 24 * card.scale, rl.BLACK)
+    draw_text(card.card.name, text_position, 
+        scale = 24 * card.scale, 
+        color = rl.BLACK, 
+        font = .nova_square_regular)
 }
 
 card_get_rect :: proc(card: ^PhysicalCard) -> rl.Rectangle {

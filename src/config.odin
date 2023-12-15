@@ -22,3 +22,5 @@ INPUT_TIMER :: 0.3
 
 CARD_WIDTH :: 120.0
 CARD_HEIGHT :: 200.0
+
+FONT_DEFAULT :: Font_Id.lilita_one_regular

@@ -25,10 +25,12 @@ Sprite_Paths := [Sprite_Id]string {
 
 Font_Id :: enum {
     lilita_one_regular,
+    nova_square_regular,
 }
 
 Font_Paths := [Font_Id]string {
     .lilita_one_regular = "LilitaOne-Regular.ttf",
+    .nova_square_regular = "NovaSquare-Regular.ttf",
 }
 
 graphics_create :: proc(game_state: ^Game_State) {
