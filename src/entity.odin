@@ -44,9 +44,5 @@ entity_draw_gui :: proc(entity: ^Entity) {
     gui_position := camera_world_to_gui(
         &graphics.camera, entity.draw_position + {0, -0.2})
     
-    rl.DrawTextEx(
-        rl.GuiGetFont(), 
-        cstr(format("HP: ", entity.health)), 
-        gui_position, 
-        32, 0, rl.WHITE)
+    draw_text(format("HP: ", entity.health), gui_position)
 }

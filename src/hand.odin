@@ -71,7 +71,7 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
         mouse_in_rect := point_in_rect(mouse_gui_position, &card_rect)
         
         if hand.hover_is_selected {
-            card.target_scale = 2
+            card.target_scale = 2.5
             card.target_position = mouse_gui_position +
                 FVec2 { CARD_WIDTH * 2, CARD_HEIGHT / 2 }
             mouse_world_position := camera_world_mouse_position(camera)

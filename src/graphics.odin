@@ -86,7 +86,9 @@ _load_fonts :: proc() -> map[Font_Id]rl.Font {
     for font_id in Font_Id {
         font_path := Font_Paths[font_id]
         full_path := strings.concatenate({ASSETS_PATH, font_path})
-        m[font_id] = rl.LoadFont(cstr(full_path))
+        m[font_id] = rl.LoadFontEx(cstr(full_path), 128, {}, 0)
+        rl.SetTextureFilter(
+            m[font_id].texture, rl.TextureFilter.BILINEAR)
     }
     return m
 }

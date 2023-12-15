@@ -139,11 +139,7 @@ _main_draw :: proc(game_state: ^Game_State) {
             }, 
             { 0, 0 }, 0.0, rl.WHITE)
         
-        rl.DrawTextEx(
-            rl.GuiGetFont(), 
-            cstr(format(rl.GetFPS())), 
-            {16, 16}, 
-            32, 0, rl.WHITE)
+        draw_text(format(rl.GetFPS()), {16, 16})
 
         // GUI
         for entity_id in world_get_entities_around(
