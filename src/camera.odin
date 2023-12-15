@@ -12,13 +12,13 @@ Camera :: struct {
 camera_step :: proc(camera: ^Camera, world: ^World) {
     target_entity := world.entities[camera.target_id]
     
-    target_position_world := target_entity.position - camera.view_size / 2
-    target_position_world.x = mround(target_position_world.x, 16)
-    target_position_world.y = mround(target_position_world.y, 9)
+    target_position_world := target_entity.draw_position - 
+        f_vec_2(camera.view_size) / 2
 
     scale := camera_surface_scale(camera)
-    target_position := world_to_surface(target_position_world) * scale
-    camera.position = move_towards(camera.position, target_position, 0.1)
+    target_position := target_position_world * GRID_SIZE * scale
+    
+    camera.position = move_towards(camera.position, target_position, CAMERA_SPEED, 0.25)
 }
 
 camera_gui_mouse_position :: proc(camera: ^Camera) -> FVec2 {

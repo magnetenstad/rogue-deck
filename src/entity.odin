@@ -31,7 +31,8 @@ entity_draw :: proc(entity: ^Entity) {
     texture := graphics.sprites[entity.sprite_id]
     scale := camera_surface_scale(&graphics.camera)
     rl.DrawTextureEx(texture, 
-        entity.draw_position * GRID_SIZE - graphics.camera.position / scale, 
+        entity.draw_position * GRID_SIZE - 
+            floor_v(graphics.camera.position / scale), 
         0,
         1.0,
         rl.WHITE)

@@ -78,7 +78,7 @@ main_draw :: proc(game_state: ^Game_State) {
             for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
                 if ((x % 2) + (y % 2)) != 1 do continue
                 rl.DrawRectangleV(
-                    (f_vec_2(x, y)) * GRID_SIZE - camera.position / scale,
+                    (f_vec_2(x, y)) * GRID_SIZE - floor_v(camera.position / scale),
                     {GRID_SIZE, GRID_SIZE},
                     {40, 26, 30, 255})
             }
@@ -103,8 +103,8 @@ main_draw :: proc(game_state: ^Game_State) {
         surface_origin := camera_surface_origin(camera)
         // Hack to make camera smooth
         subpixel := FVec2 {
-            mround(camera.position.x, scale)- camera.position.x,
-            mround(camera.position.y, scale) - camera.position.y,
+            mfloor(camera.position.x, scale)- camera.position.x,
+            mfloor(camera.position.y, scale) - camera.position.y,
         }
 
         rl.DrawTexturePro(

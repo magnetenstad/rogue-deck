@@ -9,6 +9,14 @@ mround :: proc(value: $T, multiple: T) -> T {
     return T(math.round(f32(value) / f32(multiple))) * multiple
 }
 
+mfloor :: proc(value: $T, multiple: T) -> T {
+    return T(math.floor(f32(value) / f32(multiple))) * multiple
+}
+
+floor_v :: proc(value: $T) -> T {
+    return { math.floor(value.x), math.floor(value.y) }
+}
+
 FVec2 :: rl.Vector2
 IVec2 :: distinct [2]int
 
@@ -38,31 +46,34 @@ i_vec_2 :: proc{
     i_vec_2_from_f_vec,
 }
 
+// For use in world space
 move_towards_vec :: proc(position: FVec2, target: FVec2, 
-        multiplier: f32) -> FVec2 {
+        multiplier: f32, min_length: f32 = ONE_PIXEL) -> FVec2 {
     difference := (target - position)
-    if linalg.length(difference) < ONE_PIXEL {
+    if linalg.length(difference) < min_length {
         return target
-    } else if linalg.length(difference) * multiplier < ONE_PIXEL {
-        return position + linalg.normalize(difference) / GRID_SIZE
+    } else if linalg.length(difference) * multiplier < min_length {
+        return position + linalg.normalize(difference) * min_length
     } else {
         return position + difference * multiplier
     }
 }
 
+// For use in world space
 move_towards_scalar :: proc(position: $T/f32, target: T, 
-        multiplier: f32) -> T {
+        multiplier: f32, min_length: f32 = ONE_PIXEL) -> T {
     difference := target - position
     length := math.abs(difference)
-    if length < ONE_PIXEL {
+    if length < min_length {
         return target
-    } else if length * multiplier < ONE_PIXEL {
-        return position + math.sign(difference) / GRID_SIZE
+    } else if length * multiplier < min_length {
+        return position + math.sign(difference) * min_length
     } else {
         return position + difference * multiplier
     }
 }
 
+// For use in world space
 move_towards :: proc {
     move_towards_vec,
     move_towards_scalar,
