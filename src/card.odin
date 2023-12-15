@@ -165,18 +165,11 @@ hand_draw_to_screen :: proc(hand: ^Hand, camera: ^Camera) {
     }
 }
 
-card_is_playable_at :: proc(card: ^Card, 
-        world: ^World, position: IVec2) -> (playable: bool) {
-    world_empty(world, position) or_return
-    return true
-}
-
 @(private="file")
 card_play :: proc (card: ^Card, 
         world: ^World, position: IVec2) -> bool {
     if !card_is_playable_at(card, world, position) do return false
-    card.play(world, position)
-    return true
+    return card.play(world, position)
 }
 
 card_draw_to_screen :: proc(card: ^PhysicalCard) {

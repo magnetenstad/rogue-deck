@@ -34,7 +34,8 @@ main :: proc() {
 }
 
 main_step :: proc(game_state: ^Game_State) {
-    player := &game_state.world.entities[game_state.player_id]
+    player, _ := world_get_entity(&game_state.world, 
+        game_state.player_id).(^Entity)
 
     // Entities
     switch game_state.phase {
@@ -44,7 +45,8 @@ main_step :: proc(game_state: ^Game_State) {
         case .turn_enemy:
             for entity_id in world_get_entities_around(
                     &game_state.world, player.position) {
-                entity := &game_state.world.entities[entity_id]
+                entity, _ := world_get_entity(&game_state.world, 
+                    entity_id).(^Entity)
                 enemy_step(entity)
             }
             game_state.phase = .turn_player
@@ -53,7 +55,8 @@ main_step :: proc(game_state: ^Game_State) {
     for entity_id in world_get_entities_around(
             &game_state.world, player.position) {
         
-        entity := &game_state.world.entities[entity_id]
+        entity, _ := world_get_entity(&game_state.world, 
+            entity_id).(^Entity)
         entity_step(entity)
     }
 
@@ -85,11 +88,13 @@ main_draw :: proc(game_state: ^Game_State) {
         }
         
         // Entities
-        player := &game_state.world.entities[game_state.player_id]
+        player, _ := world_get_entity(&game_state.world, 
+            game_state.player_id).(^Entity)
         for entity_id in world_get_entities_around(
                 &game_state.world, player.position) {
 
-            entity := &game_state.world.entities[entity_id]
+            entity, _ := world_get_entity(&game_state.world, 
+                entity_id).(^Entity)
             entity_draw(entity)
         }
     }

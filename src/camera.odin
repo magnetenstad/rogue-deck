@@ -10,7 +10,8 @@ Camera :: struct {
 }
 
 camera_step :: proc(camera: ^Camera, world: ^World) {
-    target_entity := world.entities[camera.target_id]
+    target_entity, _ := world_get_entity_from_id(
+        world, camera.target_id).(^Entity)
     
     target_position_world := target_entity.draw_position - 
         f_vec_2(camera.view_size) / 2

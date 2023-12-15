@@ -6,11 +6,13 @@ import "core:math"
 World :: struct {
     chunks: map[IVec2]Chunk,
     entities: [dynamic]Entity,
+    next_entity_id: int,
 }
 
 Chunk :: struct {
     entity_ids: [dynamic]int,
 }
+
 
 world_to_chunk_entity :: proc(entity: ^Entity) -> IVec2 {
     return world_to_chunk_ivec(entity.position)
@@ -38,15 +40,24 @@ world_to_chunk :: proc{
 
 world_add_entity :: proc(world: ^World, entity: Entity) -> int {
     entity := entity
-    entity.id = len(world.entities)
+    entity.id = world.next_entity_id
+    world.next_entity_id += 1
     append(&world.entities, entity)
     chunk_add_entity(world, entity.id)
     return entity.id
 }
 
+world_remove_entity :: proc(world: ^World, entity: ^Entity) -> bool {
+    index := world_get_entity_index(world, entity.id)
+    if index < 0 do return false
+    chunk_remove_entity(world, entity)
+    unordered_remove(&world.entities, index)
+    return true
+}
+
 // Places the given entity in the chunk that matches its position
 chunk_add_entity :: proc(world: ^World, entity_id: int) {
-    entity := &world.entities[entity_id]
+    entity, _ := world_get_entity(world, entity_id).(^Entity)
     chunk_position := world_to_chunk(entity.position)
 
     if chunk_position not_in world.chunks {
@@ -57,6 +68,19 @@ chunk_add_entity :: proc(world: ^World, entity_id: int) {
     append(&chunk.entity_ids, entity.id)
     entity.chunk = chunk_position
 }
+
+// Removes the entity from entity.chunk
+chunk_remove_entity :: proc(world: ^World, entity: ^Entity) -> bool {
+    chunk := &world.chunks[entity.chunk]
+    for entity_id, i in chunk.entity_ids {
+        if entity_id == entity.id {
+            unordered_remove(&chunk.entity_ids, i)
+            return true
+        }
+    }
+    return false
+}
+
 
 world_get_entities_around :: proc(world: ^World, 
         world_position: IVec2) -> [dynamic]int {
@@ -81,40 +105,54 @@ world_get_entities_around :: proc(world: ^World,
 }
 
 chunk_validate :: proc(world: ^World, entity: ^Entity) {
-    
     chunk_position := world_to_chunk(entity)
     if entity.chunk == chunk_position do return
-
-    chunk_before := &world.chunks[entity.chunk]
-    removed := false
-
-    for entity_id, i in chunk_before.entity_ids {
-        if entity_id == entity.id {
-            unordered_remove(&chunk_before.entity_ids, i)
-            removed = true
-            break
-        }
-    }
-    assert(removed)
-
+    assert(chunk_remove_entity(world, entity))
     chunk_add_entity(world, entity.id)
 }
 
-world_get_entity :: proc(world: ^World, 
-        world_position: IVec2) -> Maybe(int) {
+world_get_entity_from_position :: proc(world: ^World, 
+        world_position: IVec2) -> Maybe(^Entity) {
 
     chunk_position := world_to_chunk(world_position)
     if chunk_position not_in world.chunks do return nil
-
     chunk := world.chunks[chunk_position]
     for entity_id in chunk.entity_ids {
-        entity := &world.entities[entity_id]
-        if entity.position == world_position do return entity_id
+        entity, _ := world_get_entity(world, entity_id).(^Entity)
+        if entity.position == world_position {
+            return entity
+        }
     }
     return nil
 }
 
+world_get_entity_from_id :: proc(world: ^World, 
+        entity_id: int) -> Maybe(^Entity) {
+    index := world_get_entity_index(world, entity_id)
+    if index < 0 {
+        return nil
+    } else {
+        return &world.entities[index]
+    }
+}
+
+// Return its position in world.entities, not its id.
+// Returns -1 if it is not found.
+world_get_entity_index :: proc(world: ^World, entity_id: int) -> int {
+    for entity, i in world.entities {
+        if entity.id == entity_id {
+            return i
+        }
+    }
+    return -1
+}
+
+world_get_entity :: proc {
+    world_get_entity_from_position,
+    world_get_entity_from_id,
+}
+
 world_empty :: proc(world: ^World, world_position: IVec2) -> bool {
-    _, not_empty := world_get_entity(world, world_position).(int)
+    _, not_empty := world_get_entity(world, world_position).(^Entity)
     return !not_empty
 }
