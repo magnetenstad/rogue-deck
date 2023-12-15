@@ -79,22 +79,14 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
         
         if hand.hover_is_selected {
             card.target_scale = 2
-
-            if camera_mouse_in_surface(camera) {
-                card.target_position = mouse_gui_position +
-                    FVec2 { CARD_WIDTH * 2, CARD_HEIGHT / 2 }
-            } else {
-                card.target_position = mouse_gui_position
-            }
-
+            card.target_position = mouse_gui_position +
+                FVec2 { CARD_WIDTH * 2, CARD_HEIGHT / 2 }
             mouse_world_position := camera_world_mouse_position(camera)
             hand.hover_target = mouse_world_position
 
             if rl.IsMouseButtonReleased(.LEFT) {
-                if camera_mouse_in_surface(camera) {
-                    hand_play(hand, hover_index, 
-                        deck, world, mouse_world_position)
-                }
+                hand_play(hand, hover_index, 
+                    deck, world, mouse_world_position)
                 _hand_unhover(hand)
             }
         } else if !mouse_in_rect {

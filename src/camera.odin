@@ -11,12 +11,13 @@ Camera :: struct {
 
 camera_step :: proc(camera: ^Camera, world: ^World) {
     target_entity := world.entities[camera.target_id]
+    
+    target_position_world := target_entity.position - camera.view_size / 2
+    target_position_world.x = mround(target_position_world.x, 16)
+    target_position_world.y = mround(target_position_world.y, 9)
 
-    target_position := 
-        f_vec_2(target_entity.position) - f_vec_2(camera.view_size) / 2
-    target_position.x = mround(target_position.x, 16)
-    target_position.y = mround(target_position.y, 9)
- 
+    scale := camera_surface_scale(camera)
+    target_position := world_to_surface(target_position_world) * scale
     camera.position = move_towards(camera.position, target_position, 0.1)
 }
 
@@ -24,11 +25,6 @@ camera_gui_mouse_position :: proc(camera: ^Camera) -> FVec2 {
     mouse_screen_position := rl.GetMousePosition()
     origin := camera_surface_origin(camera)
     return mouse_screen_position - origin
-}
-
-camera_surface_mouse_position :: proc(camera: ^Camera) -> FVec2 {
-    scale := camera_surface_scale(camera)
-    return camera_gui_mouse_position(camera) / scale
 }
 
 camera_world_mouse_position :: proc(camera: ^Camera) -> IVec2 {
@@ -44,7 +40,7 @@ camera_surface_scale :: proc(camera: ^Camera) -> f32 {
     screen_height := f32(rl.GetScreenHeight())
     surface_width := f32(SURFACE_WIDTH)
     surface_height := f32(SURFACE_HEIGHT)
-    return min(
+    return max(
         screen_width / surface_width, 
         screen_height / surface_height,
     )
@@ -62,23 +58,18 @@ camera_surface_origin :: proc(camera: ^Camera) -> FVec2 {
     }
 }
 
-camera_world_to_surface :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
-    return (f_vec_2(position) - camera.position) * GRID_SIZE
+world_to_surface :: proc(position: IVec2) -> FVec2 {
+    return f_vec_2(position) * GRID_SIZE
 }
 
 camera_gui_to_world :: proc(camera: ^Camera, position: FVec2) -> IVec2 {
     scale := camera_surface_scale(camera)
-    return i_vec_2(position / (GRID_SIZE * scale) + camera.position)
+    return i_vec_2((position + camera.position) / (GRID_SIZE * scale))
 }
 
 camera_world_to_gui :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
     scale := camera_surface_scale(camera)
     origin := camera_surface_origin(camera)
-    return origin + camera_world_to_surface(camera, position) * scale
-}
-
-camera_mouse_in_surface :: proc(camera: ^Camera) -> bool {
-    mouse_surface_position := camera_surface_mouse_position(camera)
-    return point_in_rect(mouse_surface_position, 
-        &rl.Rectangle { 0, 0, SURFACE_WIDTH, SURFACE_HEIGHT })
+    surface_position := world_to_surface(position)
+    return origin + surface_position * scale - camera.position 
 }

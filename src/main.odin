@@ -67,6 +67,7 @@ main_step :: proc(game_state: ^Game_State) {
 
 main_draw :: proc(game_state: ^Game_State) {
     camera := &game_state.graphics.camera
+    scale := camera_surface_scale(camera)
     
     // Draw onto texture
     rl.BeginTextureMode(game_state.graphics.surface)
@@ -77,7 +78,7 @@ main_draw :: proc(game_state: ^Game_State) {
             for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
                 if ((x % 2) + (y % 2)) != 1 do continue
                 rl.DrawRectangleV(
-                    (f_vec_2(x, y) - camera.position) * GRID_SIZE,
+                    (f_vec_2(x, y)) * GRID_SIZE - camera.position / scale,
                     {GRID_SIZE, GRID_SIZE},
                     {40, 26, 30, 255})
             }
@@ -97,17 +98,21 @@ main_draw :: proc(game_state: ^Game_State) {
     // Draw texture onto screen
     rl.BeginDrawing()
     {
-        rl.ClearBackground(rl.GRAY)
+        rl.ClearBackground(rl.BLACK)
         texture := game_state.graphics.surface.texture
-        scale := camera_surface_scale(camera)
         surface_origin := camera_surface_origin(camera)
+        // Hack to make camera smooth
+        subpixel := FVec2 {
+            mround(camera.position.x, scale)- camera.position.x,
+            mround(camera.position.y, scale) - camera.position.y,
+        }
 
         rl.DrawTexturePro(
             texture, 
             { 0.0, 0.0, f32(texture.width), - f32(texture.height) },
             {
-                surface_origin.x,
-                surface_origin.y,
+                surface_origin.x + subpixel.x,
+                surface_origin.y + subpixel.y,
                 f32(SURFACE_WIDTH)*scale, 
                 f32(SURFACE_HEIGHT)*scale,
             }, 

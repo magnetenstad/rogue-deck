@@ -5,8 +5,8 @@ import "core:math"
 import "core:math/linalg"
 import rl "vendor:raylib"
 
-mround :: proc(value: f32, multiple: f32) -> f32 {
-    return math.round(value / multiple) * multiple
+mround :: proc(value: $T, multiple: T) -> T {
+    return T(math.round(f32(value) / f32(multiple))) * multiple
 }
 
 FVec2 :: rl.Vector2
