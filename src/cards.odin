@@ -38,8 +38,8 @@ get_card :: proc(card_id: Card_Id) -> Card {
                 name = "Dagger",
                 play = proc(world: ^World, position: IVec2) -> bool { 
                     entity, hit := world_get_entity(world, position).(^Entity)
-                    if entity.id == get_game_state().player_id do return false
                     if hit {
+                        (entity.id != get_game_state().player_id) or_return
                         world_remove_entity(world, entity)
                     } 
                     return hit
