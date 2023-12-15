@@ -11,7 +11,6 @@ get_game_state :: proc() -> ^Game_State {
     return &_game_state
 }
 
-@(private="file")
 main :: proc() {
     // Read save file and create game state
     data_read, ok := os.read_entire_file("saves/data.json")
