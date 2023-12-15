@@ -50,7 +50,7 @@ game_state_create :: proc() -> Game_State {
     }
     for i in 0 ..< 100 {
         card_id := rand.choice(card_ids)
-        card := get_card(card_id)
+        card := card_get(card_id)
         append(&game_state.deck.cards, card)
     }
    

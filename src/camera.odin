@@ -10,7 +10,7 @@ Camera :: struct {
 }
 
 camera_step :: proc(camera: ^Camera, world: ^World) {
-    target_entity, _ := world_get_entity_from_id(
+    target_entity, _ := world_get_entity(
         world, camera.target_id).(^Entity)
     
     target_position_world := target_entity.draw_position - 
@@ -59,8 +59,30 @@ camera_surface_origin :: proc(camera: ^Camera) -> FVec2 {
     }
 }
 
-world_to_surface :: proc(position: IVec2) -> FVec2 {
-    return f_vec_2(position) * GRID_SIZE
+@(private="file")
+_camera_world_to_surface_i :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
+    return camera_world_to_surface(camera, f_vec_2(position))
+}
+
+@(private="file")
+_camera_world_to_surface_f :: proc(camera: ^Camera, position: FVec2) -> FVec2 {
+    scale := camera_surface_scale(camera)
+    return position * GRID_SIZE - floor_v(camera.position / scale)
+}
+
+@(private="file")
+_camera_world_to_surface_rect :: proc(camera: ^Camera, 
+        rect: rl.Rectangle) -> rl.Rectangle {
+    position := camera_world_to_surface(camera, FVec2 { rect.x, rect.y })
+    width := rect.width * GRID_SIZE
+    height := rect.height * GRID_SIZE
+    return rl.Rectangle { position.x, position.y, width, height }
+}
+
+camera_world_to_surface :: proc {
+    _camera_world_to_surface_i,
+    _camera_world_to_surface_f,
+    _camera_world_to_surface_rect,
 }
 
 camera_gui_to_world :: proc(camera: ^Camera, position: FVec2) -> IVec2 {
@@ -71,6 +93,10 @@ camera_gui_to_world :: proc(camera: ^Camera, position: FVec2) -> IVec2 {
 camera_world_to_gui :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
     scale := camera_surface_scale(camera)
     origin := camera_surface_origin(camera)
-    surface_position := world_to_surface(position)
-    return origin + surface_position * scale - camera.position 
+    surface_position := camera_world_to_surface(camera, position)
+    subpixel := FVec2 {
+        mfloor(camera.position.x, scale)- camera.position.x,
+        mfloor(camera.position.y, scale) - camera.position.y,
+    }
+    return origin + surface_position * scale + subpixel
 }

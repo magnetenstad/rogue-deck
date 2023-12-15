@@ -46,8 +46,12 @@ i_vec_2 :: proc{
     i_vec_2_from_f_vec,
 }
 
-// For use in world space
-move_towards_vec :: proc(position: FVec2, target: FVec2, 
+f_rect :: proc(x, y, width, height: $T) -> rl.Rectangle {
+    return rl.Rectangle { f32(x), f32(y), f32(width), f32(height) }
+}
+
+@(private="file")
+_move_towards_vec :: proc(position: FVec2, target: FVec2, 
         multiplier: f32, min_length: f32 = ONE_PIXEL) -> FVec2 {
     difference := (target - position)
     if linalg.length(difference) < min_length {
@@ -59,8 +63,8 @@ move_towards_vec :: proc(position: FVec2, target: FVec2,
     }
 }
 
-// For use in world space
-move_towards_scalar :: proc(position: $T/f32, target: T, 
+@(private="file")
+_move_towards_scalar :: proc(position: $T/f32, target: T, 
         multiplier: f32, min_length: f32 = ONE_PIXEL) -> T {
     difference := target - position
     length := math.abs(difference)
@@ -75,15 +79,15 @@ move_towards_scalar :: proc(position: $T/f32, target: T,
 
 // For use in world space
 move_towards :: proc {
-    move_towards_vec,
-    move_towards_scalar,
+    _move_towards_vec,
+    _move_towards_scalar,
 }
 
-point_in_rect :: proc(point: FVec2, rect: ^rl.Rectangle) -> bool {
-    return rect.x <= point.x && 
-        point.x <= rect.x + rect.width &&
-        rect.y <= point.y &&
-        point.y <= rect.y + rect.height
+point_in_rect :: proc(point: $T, rect: ^rl.Rectangle) -> bool {
+    return rect.x <= f32(point.x) && 
+        f32(point.x) <= rect.x + rect.width &&
+        rect.y <= f32(point.y) &&
+        f32(point.y) <= rect.y + rect.height
 }
 
 sort_indices_by :: proc(data: $T/[]$E, less: proc(i, j: E) -> bool) -> []int {

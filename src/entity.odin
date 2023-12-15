@@ -29,10 +29,9 @@ entity_step :: proc(entity: ^Entity) {
 entity_draw :: proc(entity: ^Entity) {
     graphics := &get_game_state().graphics
     texture := graphics.sprites[entity.sprite_id]
-    scale := camera_surface_scale(&graphics.camera)
-    rl.DrawTextureEx(texture, 
-        entity.draw_position * GRID_SIZE - 
-            floor_v(graphics.camera.position / scale), 
+    rl.DrawTextureEx(texture,
+        camera_world_to_surface(
+            &graphics.camera, entity.draw_position),
         0,
         1.0,
         rl.WHITE)

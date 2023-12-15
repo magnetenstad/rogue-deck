@@ -111,7 +111,8 @@ chunk_validate :: proc(world: ^World, entity: ^Entity) {
     chunk_add_entity(world, entity.id)
 }
 
-world_get_entity_from_position :: proc(world: ^World, 
+@(private="file")
+_world_get_entity_from_position :: proc(world: ^World, 
         world_position: IVec2) -> Maybe(^Entity) {
 
     chunk_position := world_to_chunk(world_position)
@@ -126,7 +127,8 @@ world_get_entity_from_position :: proc(world: ^World,
     return nil
 }
 
-world_get_entity_from_id :: proc(world: ^World, 
+@(private="file")
+_world_get_entity_from_id :: proc(world: ^World, 
         entity_id: int) -> Maybe(^Entity) {
     index := world_get_entity_index(world, entity_id)
     if index < 0 {
@@ -134,6 +136,11 @@ world_get_entity_from_id :: proc(world: ^World,
     } else {
         return &world.entities[index]
     }
+}
+
+world_get_entity :: proc {
+    _world_get_entity_from_position,
+    _world_get_entity_from_id,
 }
 
 // Return its position in world.entities, not its id.
@@ -145,11 +152,6 @@ world_get_entity_index :: proc(world: ^World, entity_id: int) -> int {
         }
     }
     return -1
-}
-
-world_get_entity :: proc {
-    world_get_entity_from_position,
-    world_get_entity_from_id,
 }
 
 world_empty :: proc(world: ^World, world_position: IVec2) -> bool {

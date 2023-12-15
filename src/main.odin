@@ -11,6 +11,13 @@ get_game_state :: proc() -> ^Game_State {
     return &_game_state
 }
 
+get_player :: proc() -> ^Entity {
+    game_state := get_game_state()
+    player, _ := world_get_entity(&game_state.world, 
+        game_state.player_id).(^Entity)
+    return player
+}
+
 main :: proc() {
     // Read save file and create game state
     data_read, ok := os.read_entire_file("saves/data.json")
@@ -35,8 +42,7 @@ main :: proc() {
 
 @(private="file")
 _main_step :: proc(game_state: ^Game_State) {
-    player, _ := world_get_entity(&game_state.world, 
-        game_state.player_id).(^Entity)
+    player := get_player()
 
     // Entities
     switch game_state.phase {
@@ -73,7 +79,8 @@ _main_step :: proc(game_state: ^Game_State) {
 _main_draw :: proc(game_state: ^Game_State) {
     camera := &game_state.graphics.camera
     scale := camera_surface_scale(camera)
-    
+    player := get_player()
+
     // Draw onto texture
     rl.BeginTextureMode(game_state.graphics.surface)
     {
@@ -83,21 +90,28 @@ _main_draw :: proc(game_state: ^Game_State) {
             for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
                 if ((x % 2) + (y % 2)) != 1 do continue
                 rl.DrawRectangleV(
-                    (f_vec_2(x, y)) * GRID_SIZE - floor_v(camera.position / scale),
+                    camera_world_to_surface(camera, IVec2 { x, y }),
                     {GRID_SIZE, GRID_SIZE},
                     {40, 26, 30, 255})
             }
         }
         
         // Entities
-        player, _ := world_get_entity(&game_state.world, 
-            game_state.player_id).(^Entity)
         for entity_id in world_get_entities_around(
                 &game_state.world, player.position) {
 
             entity, _ := world_get_entity(&game_state.world, 
                 entity_id).(^Entity)
             entity_draw(entity)
+        }
+
+        // Card range
+        card_index, is_hovering := game_state.hand.hover_index.(int)
+        if is_hovering {
+            card := &game_state.hand.cards[card_index]
+            rect := camera_world_to_surface(camera, 
+                card_get_range_rect(&card.card))
+            rl.DrawRectangleLinesEx(rect, 1, rl.WHITE)
         }
     }
     rl.EndTextureMode()

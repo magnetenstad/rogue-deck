@@ -38,7 +38,7 @@ card_get_rect :: proc(card: ^PhysicalCard) -> rl.Rectangle {
     }
 }
 
-get_card :: proc(card_id: Card_Id) -> Card {
+card_get :: proc(card_id: Card_Id) -> Card {
     switch card_id {
         case .skeleton:
             return Card {
@@ -48,17 +48,16 @@ get_card :: proc(card_id: Card_Id) -> Card {
                         Entity{kind=.enemy, sprite_id=.skeleton, position=position})
                     return true
                 },
+                range = 5,
             }
         case .teleport:
             return Card {
                 name = "Teleport",
                 play = proc(world: ^World, position: IVec2) -> bool { 
-                    state := get_game_state()
-                    player, _ := world_get_entity(world, 
-                        state.player_id).(^Entity)
-                    player.position = position
+                    get_player().position = position
                     return true
                 },
+                range = 7,
             }
         case .dagger:
             return Card {
@@ -71,6 +70,7 @@ get_card :: proc(card_id: Card_Id) -> Card {
                     } 
                     return hit
                 },
+                range = 1,
             }
     }
     return Card {
@@ -79,4 +79,14 @@ get_card :: proc(card_id: Card_Id) -> Card {
             return true
         },
     }
+}
+
+card_get_range_rect :: proc(card: ^Card) -> rl.Rectangle {
+    player := get_player()
+    return f_rect(
+        player.position.x - card.range,
+        player.position.y - card.range,
+        1 + card.range * 2,
+        1 + card.range * 2,
+    )
 }

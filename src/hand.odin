@@ -116,6 +116,8 @@ hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck,
     if index >= len(hand.cards) do return false
 
     card := hand.cards[index]
+    rect := card_get_range_rect(&card.card)
+    if !point_in_rect(position, &rect) do return false
     if !card.card.play(world, position) do return false
     
     ordered_remove(&hand.cards, index)
