@@ -2,6 +2,7 @@
 package main
 
 import "core:math/rand"
+import "core:math/linalg"
 import rl "vendor:raylib"
 
 PhysicalCard :: struct {
@@ -50,7 +51,10 @@ hand_step :: proc(game_state: ^Game_State) {
         card.z_index = 0
         
         card_rect := card_get_rect(card)
-        if !is_hovering && point_in_rect(mouse_gui_position, &card_rect) {
+        if !is_hovering && 
+            linalg.distance(card.position, card.target_position) < 2 &&
+            point_in_rect(mouse_gui_position, &card_rect) 
+        {
             hand.hover_index = i
         }
     }
@@ -60,7 +64,7 @@ hand_step :: proc(game_state: ^Game_State) {
         card.z_index = 1
 
         if !hand.hover_is_selected {
-            card.target_scale = 2
+            card.target_scale = 1.5
             card.target_position = 
                 _card_position(hover_index, len(hand.cards)) + 
                 FVec2 { 0, - CARD_HEIGHT / 2}
@@ -99,7 +103,7 @@ hand_step_player :: proc(game_state: ^Game_State) {
         }
 
         if hand.hover_is_selected {
-            card.target_scale = 2.5
+            card.target_scale = 2
             card.target_position = mouse_gui_position +
                 FVec2 { CARD_WIDTH * 2, CARD_HEIGHT / 2 }
             mouse_world_position := camera_world_mouse_position(camera)

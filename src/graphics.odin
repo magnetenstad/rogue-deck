@@ -46,7 +46,7 @@ graphics_create :: proc(game_state: ^Game_State) {
     }
     
     rl.InitWindow(window_width, window_height, "Rogue Deck")
-    rl.SetWindowState({.WINDOW_RESIZABLE, .WINDOW_TOPMOST})
+    rl.SetWindowState({.WINDOW_RESIZABLE})
     rl.SetTargetFPS(60)
 
     when DEV && DESKTOP {

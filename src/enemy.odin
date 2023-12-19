@@ -17,7 +17,18 @@ enemy_step :: proc(enemy: ^Entity) {
     assert(enemy.kind == .enemy)
     if enemy.done do return
 
-    move := rand.choice(enemy_moves)
+    enemy_moves: [dynamic]Enemy_Move = { .nothing }
+    player := get_player()
+    if player.position.x > enemy.position.x 
+        { append(&enemy_moves, Enemy_Move.right) }
+    if player.position.x < enemy.position.x 
+        { append(&enemy_moves, Enemy_Move.left) }
+    if player.position.y > enemy.position.y 
+        { append(&enemy_moves, Enemy_Move.down) }
+    if player.position.y < enemy.position.y 
+        { append(&enemy_moves, Enemy_Move.up) }
+
+    move := rand.choice(enemy_moves[:])
     if (move == .up) { enemy.position.y -= 1 }
     if (move == .left) { enemy.position.x -= 1 }
     if (move == .down) { enemy.position.y += 1 }
