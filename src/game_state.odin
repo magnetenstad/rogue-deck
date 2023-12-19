@@ -5,18 +5,13 @@ import "core:math"
 import "core:math/rand"
 import "core:encoding/json"
 
-Game_Phase :: enum {
-    turn_player,
-    turn_enemy,
-}
-
 Game_State :: struct {
     world: World,
     graphics: Graphics,
     hand: Hand,
     deck: Deck,
-    phase: Game_Phase,
     player_id: int,
+    current_entity_id: int,
 }
 
 @(private="file")
@@ -54,8 +49,11 @@ game_state_create :: proc() -> Game_State {
 
     // Deck
     card_ids: []Card_Id = { 
-        .skeleton,
+        // .skeleton,
         .teleport,
+        .teleport,
+        .teleport,
+        .dagger,
         .dagger,
         .fire_ball,
     }
@@ -64,13 +62,15 @@ game_state_create :: proc() -> Game_State {
         card := card_get(card_id)
         append(&game_state.deck.cards, card)
     }
-   
+
     // Hand
-    game_state.hand.cards_max = 10
-    game_state.hand.cards_regen = 2
+    game_state.hand.cards_max = 8
+    game_state.hand.cards_regen = 1
     game_state.hand.mana_max = 10
     game_state.hand.mana_regen = 2
-    end_turn(&game_state)
+    for _ in 0 ..< 4 {
+        hand_draw_from_deck(&game_state.hand, &game_state.deck)
+    }
 
     return game_state
 }
@@ -97,4 +97,27 @@ game_state_deserialize :: proc(data: []byte) -> Game_State {
     }
 
     return game_state
+}
+
+select_next_entity :: proc(game_state: ^Game_State) {
+    index := -1
+    for entity, i in game_state.world.entities {
+        if entity.id == game_state.current_entity_id {
+            index = (i + 1) % len(game_state.world.entities)
+            break
+        }
+    }
+    if index != -1 {
+        entity := &game_state.world.entities[index]
+        entity.done = false
+        game_state.current_entity_id = entity.id
+        if game_state.current_entity_id == game_state.player_id {
+            player_start_turn(game_state)
+        }
+    }
+}
+
+is_player_turn :: proc() -> bool {
+    game_state := get_game_state()
+    return game_state.current_entity_id == game_state.player_id
 }

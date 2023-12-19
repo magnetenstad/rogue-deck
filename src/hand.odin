@@ -29,7 +29,9 @@ Hand :: struct {
     hover_is_selected: bool,
 }
 
-hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
+hand_step :: proc(game_state: ^Game_State) {
+    hand := &game_state.hand
+
     sorted_indices := sort_indices_by(
         hand.cards[:], 
         proc(a: PhysicalCard, b: PhysicalCard) -> bool { 
@@ -62,7 +64,32 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
             card.target_position = 
                 _card_position(hover_index, len(hand.cards)) + 
                 FVec2 { 0, - CARD_HEIGHT / 2}
+
+            card_rect := card_get_rect(card)
+            mouse_in_rect := point_in_rect(mouse_gui_position, &card_rect)
+            if !mouse_in_rect {
+                _hand_unhover(hand)
+            }
         }
+    }
+
+    for &card in hand.cards {
+        card.position = move_towards(
+            card.position, card.target_position, 0.2)
+        card.scale = move_towards(card.scale, card.target_scale, 0.2)
+    }
+}
+
+hand_step_player :: proc(game_state: ^Game_State) {
+    hand := &game_state.hand
+    deck := &game_state.deck
+    camera := &game_state.graphics.camera
+    world := &game_state.world
+    hover_index, is_hovering := hand.hover_index.(int)
+    mouse_gui_position := rl.GetMousePosition()
+
+    if is_hovering {
+        card := &hand.cards[hover_index]
 
         if rl.IsMouseButtonPressed(.LEFT) {
             hand.hover_is_selected = true
@@ -71,9 +98,6 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
             _hand_unhover(hand)
         }
 
-        card_rect := card_get_rect(card)
-        mouse_in_rect := point_in_rect(mouse_gui_position, &card_rect)
-        
         if hand.hover_is_selected {
             card.target_scale = 2.5
             card.target_position = mouse_gui_position +
@@ -82,19 +106,14 @@ hand_step :: proc(hand: ^Hand, deck: ^Deck, world: ^World, camera: ^Camera) {
             hand.hover_target = mouse_world_position
 
             if rl.IsMouseButtonReleased(.LEFT) {
-                hand_play(hand, hover_index, 
-                    deck, world, mouse_world_position)
+                if hand_play(hand, hover_index, 
+                    deck, world, mouse_world_position) 
+                {
+                    player_end_turn(game_state)
+                }
                 _hand_unhover(hand)
             }
-        } else if !mouse_in_rect {
-            _hand_unhover(hand)
         }
-    }
-
-    for &card in hand.cards {
-        card.position = move_towards(
-            card.position, card.target_position, 0.2)
-        card.scale = move_towards(card.scale, card.target_scale, 0.2)
     }
 }
 

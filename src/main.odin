@@ -42,37 +42,28 @@ main :: proc() {
 
 @(private="file")
 _main_step :: proc(game_state: ^Game_State) {
-    player := get_player()
 
     // Entities
-    switch game_state.phase {
-        case .turn_player:
-            player_step(player)
+    current_entity, has_current_entity := world_get_entity(
+        &game_state.world, game_state.current_entity_id).(^Entity)
 
-        case .turn_enemy:
-            for entity_id in world_get_entities_around(
-                    &game_state.world, player.position) {
-                entity, _ := world_get_entity(&game_state.world, 
-                    entity_id).(^Entity)
-                enemy_step(entity)
-            }
-            game_state.phase = .turn_player
+    if has_current_entity {
+        switch current_entity.kind {
+            case .player:
+                player_step(current_entity)
+    
+            case .enemy:
+                enemy_step(current_entity)
+        }
+        entity_step(current_entity)
     }
     
-    for entity_id in world_get_entities_around(
-            &game_state.world, player.position) {
-        
-        entity, _ := world_get_entity(&game_state.world, 
-            entity_id).(^Entity)
-        entity_step(entity)
-    }
-
     // Camera
     camera := &game_state.graphics.camera
     camera_step(camera, &game_state.world)
 
     // Hand
-    hand_step(&game_state.hand, &game_state.deck, &game_state.world, camera)
+    hand_step(game_state)
 }
 
 @(private="file")
@@ -153,21 +144,6 @@ _main_draw :: proc(game_state: ^Game_State) {
         }
         
         hand_draw_gui(&game_state.hand, camera)
-
-        gui_button("End Turn", {64, 256}, proc() {
-            end_turn(get_game_state())
-        }, 2)
     }
     rl.EndDrawing()
-}
-
-end_turn :: proc(game_state: ^Game_State) {
-    for _ in 0 ..< game_state.hand.cards_regen {
-        hand_draw_from_deck(&game_state.hand, &game_state.deck)
-    }
-    for _ in 0 ..< game_state.hand.mana_regen {
-        game_state.hand.mana = min(
-            game_state.hand.mana_max, game_state.hand.mana + 1)
-    }
-    game_state.phase = .turn_enemy
 }

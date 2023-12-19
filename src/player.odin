@@ -9,22 +9,18 @@ import "core:slice"
 _time_last_input := time.now()
 
 player_step :: proc(player: ^Entity) {
-    if player.kind != .player do return
-    game_state := get_game_state()
-    if game_state.phase != .turn_player do return
+    assert(player.kind == .player)
+    assert(is_player_turn())
     
-    time_now := time.now()
-    duration := time.duration_seconds(time.diff(_time_last_input, time_now))
-    key := _get_key()
-
-    if duration > INPUT_TIMER && key != .KEY_NULL {
-        #partial switch key {
-            case .W: { player.position.y -= 1 }
-            case .A: { player.position.x -= 1 }
-            case .S: { player.position.y += 1 }
-            case .D: { player.position.x += 1 }
-        }
-        _time_last_input = time_now
+    game_state := get_game_state()
+    hand_step_player(game_state)
+    
+    costs, _ := slice.mapper(
+        game_state.hand.cards[:],
+        proc(c: PhysicalCard) -> int { return c.card.cost },
+    )
+    if slice.max(costs) > game_state.hand.mana {
+        player_end_turn(game_state)
     }
 }
 
@@ -51,4 +47,21 @@ _get_key :: proc() -> rl.KeyboardKey {
         key = _key_queue[len(_key_queue) - 1]
     }
     return key
+}
+
+player_end_turn :: proc(game_state: ^Game_State) {
+    player := get_player()
+    if player.done do return
+
+    player.done = true
+}
+
+player_start_turn :: proc(game_state: ^Game_State) {
+    for _ in 0 ..< game_state.hand.cards_regen {
+        hand_draw_from_deck(&game_state.hand, &game_state.deck)
+    }
+    for _ in 0 ..< game_state.hand.mana_regen {
+        game_state.hand.mana = min(
+            game_state.hand.mana_max, game_state.hand.mana + 1)
+    }
 }

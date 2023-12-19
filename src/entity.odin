@@ -16,15 +16,21 @@ Entity :: struct {
     position: IVec2,
     draw_position: FVec2,
     health: int,
+    done: bool,
 }
 
 entity_step :: proc(entity: ^Entity) {
     game_state := get_game_state()
+    assert(entity.id == game_state.current_entity_id)
 
     entity.draw_position = move_towards(
         entity.draw_position, f_vec_2(entity.position), 0.25)
         
     chunk_validate(&game_state.world, entity)
+
+    if entity.done && entity.draw_position == f_vec_2(entity.position) {
+        select_next_entity(game_state)
+    }
 }
 
 entity_draw :: proc(entity: ^Entity) {
