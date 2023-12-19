@@ -60,12 +60,24 @@ camera_surface_origin :: proc(camera: ^Camera) -> FVec2 {
 }
 
 @(private="file")
-_camera_world_to_surface_i :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
+_camera_world_to_surface_i :: proc(camera: ^Camera, value: int) -> f32 {
+    return camera_world_to_surface(camera, f32(value))
+}
+
+@(private="file")
+_camera_world_to_surface_f :: proc(camera: ^Camera, value: f32) -> f32 {
+    return value * GRID_SIZE
+}
+
+@(private="file")
+_camera_world_to_surface_i_vec :: proc(camera: ^Camera, 
+        position: IVec2) -> FVec2 {
     return camera_world_to_surface(camera, f_vec_2(position))
 }
 
 @(private="file")
-_camera_world_to_surface_f :: proc(camera: ^Camera, position: FVec2) -> FVec2 {
+_camera_world_to_surface_f_vec :: proc(camera: ^Camera, 
+        position: FVec2) -> FVec2 {
     scale := camera_surface_scale(camera)
     return position * GRID_SIZE - floor_v(camera.position / scale)
 }
@@ -82,6 +94,8 @@ _camera_world_to_surface_rect :: proc(camera: ^Camera,
 camera_world_to_surface :: proc {
     _camera_world_to_surface_i,
     _camera_world_to_surface_f,
+    _camera_world_to_surface_i_vec,
+    _camera_world_to_surface_f_vec,
     _camera_world_to_surface_rect,
 }
 

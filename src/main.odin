@@ -86,6 +86,24 @@ _main_draw :: proc(game_state: ^Game_State) {
                     {40, 26, 30, 255})
             }
         }
+
+        // Card range
+        card_index, is_hovering := game_state.hand.hover_index.(int)
+        if is_hovering {
+            player := get_player()
+            card := &game_state.hand.cards[card_index]
+            world_positions := card_get_positions(&card.card)
+            for world_position in world_positions {
+                surface_position := camera_world_to_surface(
+                    camera, world_position)
+                rl.DrawRectangleRec(rl.Rectangle {
+                    surface_position.x,
+                    surface_position.y,
+                    GRID_SIZE,
+                    GRID_SIZE,
+                }, rl.Color { 130, 150, 155, 164 })
+            }
+        }
         
         // Entities
         for entity_id in world_get_entities_around(
@@ -94,17 +112,6 @@ _main_draw :: proc(game_state: ^Game_State) {
             entity, _ := world_get_entity(&game_state.world, 
                 entity_id).(^Entity)
             entity_draw(entity)
-        }
-
-        // Card range
-        card_index, is_hovering := game_state.hand.hover_index.(int)
-        if is_hovering {
-            card := &game_state.hand.cards[card_index]
-            world_rect := card_get_range_rect(&card.card)  
-            world_rect.width += 1
-            world_rect.height += 1
-            surface_rect := camera_world_to_surface(camera, world_rect)
-            rl.DrawRectangleLinesEx(surface_rect, 1, rl.WHITE)
         }
     }
     rl.EndTextureMode()

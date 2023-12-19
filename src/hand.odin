@@ -1,6 +1,7 @@
 //+vet unused shadowing using-stmt style semicolon
 package main
 
+import "core:slice"
 import "core:math/rand"
 import "core:math/linalg"
 import rl "vendor:raylib"
@@ -144,8 +145,8 @@ hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck,
 
     card := hand.cards[index]
     if card.card.cost > hand.mana do return false
-    rect := card_get_range_rect(&card.card)
-    if !point_in_rect(position, &rect) do return false
+    positions := card_get_positions(&card.card)
+    if !slice.contains(positions, position) do return false
     if !card.card.play(world, position) do return false
     
     hand.mana -= card.card.cost

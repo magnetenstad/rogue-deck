@@ -1,6 +1,8 @@
 package main
 
 import rl "vendor:raylib"
+import "core:math/linalg"
+import "core:math"
 
 Card_Id :: enum {
     skeleton,
@@ -14,7 +16,7 @@ Card :: struct {
     cost: int,
     attack: int,
     play: proc(^World, IVec2) -> bool,
-    range: int,
+    range: f32,
     description: string,
 }
 
@@ -69,7 +71,7 @@ card_get :: proc(card_id: Card_Id) -> Card {
                         Entity{kind=.enemy, sprite_id=.skeleton, position=position})
                     return true
                 },
-                range = 4,
+                range = 4.2,
                 cost = 3,
             }
         case .teleport:
@@ -80,7 +82,7 @@ card_get :: proc(card_id: Card_Id) -> Card {
                     get_player().position = position
                     return true
                 },
-                range = 5,
+                range = 5.2,
                 cost = 1,
             }
         case .dagger:
@@ -98,7 +100,7 @@ card_get :: proc(card_id: Card_Id) -> Card {
                     } 
                     return hit
                 },
-                range = 1,
+                range = 1.2,
                 cost = 1,
             }
         case .fire_ball:
@@ -116,7 +118,7 @@ card_get :: proc(card_id: Card_Id) -> Card {
                     } 
                     return hit
                 },
-                range = 2,
+                range = 2.2,
                 cost = 4,
             }
     }
@@ -128,12 +130,18 @@ card_get :: proc(card_id: Card_Id) -> Card {
     }
 }
 
-card_get_range_rect :: proc(card: ^Card) -> rl.Rectangle {
+card_get_positions :: proc(card: ^Card) -> []IVec2 {
     player := get_player()
-    return f_rect(
-        player.position.x - card.range,
-        player.position.y - card.range,
-        card.range * 2,
-        card.range * 2,
-    )
+    positions: [dynamic]IVec2
+
+    ceil := int(math.ceil(card.range))
+
+    for x in -ceil ..= ceil {
+        for y in -ceil ..= ceil {
+            if linalg.length(f_vec_2(x, y)) <= card.range {
+                append(&positions, player.position + {x, y})
+            }
+        }    
+    }
+    return positions[:]
 }
