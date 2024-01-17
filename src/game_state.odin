@@ -49,10 +49,6 @@ game_state_create :: proc() -> Game_State {
 
     // Deck
     card_ids: []Card_Id = { 
-        // .skeleton,
-        .teleport,
-        .teleport,
-        .teleport,
         .dagger,
         .dagger,
         .fire_ball,
@@ -68,6 +64,9 @@ game_state_create :: proc() -> Game_State {
     game_state.hand.cards_regen = 1
     game_state.hand.mana_max = 10
     game_state.hand.mana_regen = 2
+    unbreakable_card := card_get(.teleport)
+    unbreakable_card.unbreakable = true
+    append(&game_state.hand.cards, PhysicalCard { card = unbreakable_card })
     for _ in 0 ..< 4 {
         hand_draw_from_deck(&game_state.hand, &game_state.deck)
     }

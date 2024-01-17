@@ -150,9 +150,11 @@ hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck,
     if !card.card.play(world, position) do return false
     
     hand.mana -= card.card.cost
-    ordered_remove(&hand.cards, index)
-    append(&deck.cards, card.card)
-    deck_shuffle(deck)
+    if (!card.card.unbreakable) {
+        ordered_remove(&hand.cards, index)
+        append(&deck.cards, card.card)
+        deck_shuffle(deck)
+    }
     return true
 }
 

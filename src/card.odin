@@ -18,12 +18,14 @@ Card :: struct {
     play: proc(^World, IVec2) -> bool,
     range: f32,
     description: string,
+    unbreakable: bool,
 }
 
 card_draw_gui :: proc(card: ^PhysicalCard) {
     rect := card_get_rect(card)
     rl.DrawRectangleRounded(rect, 0.2, 8, rl.WHITE)
-    rl.DrawRectangleRoundedLines(rect, 0.2, 8, 8, rl.BLACK)
+    outline_color := card_get_outline_color(&card.card)
+    rl.DrawRectangleRoundedLines(rect, 0.2, 8, 8, outline_color)
     text_position := FVec2 {
         rect.x + rect.width * 0.1,
         rect.y + rect.height / 2,
@@ -47,6 +49,11 @@ card_draw_gui :: proc(card: ^PhysicalCard) {
         size = 32 * card.scale, 
         color = rl.BLUE, 
         font = .lilita_one_regular)
+}
+
+card_get_outline_color :: proc(card: ^Card) -> rl.Color {
+    if card.unbreakable do return rl.BLUE
+    return rl.BLACK
 }
 
 card_get_rect :: proc(card: ^PhysicalCard) -> rl.Rectangle {
