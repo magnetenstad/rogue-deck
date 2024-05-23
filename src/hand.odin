@@ -51,10 +51,17 @@ hand_step :: proc(game_state: ^Game_State) {
         card.target_scale = 1
         card.z_index = 0
         
-        card_rect := card_get_rect(card)
+        gui_size := camera_gui_size()
+        y_hand := gui_size[1] - CARD_HEIGHT * 1.5
+        if hand.hover_is_selected || mouse_gui_position[1] < y_hand {
+            card.target_position[1] += CARD_HEIGHT
+        }
+        
+        hoverable_rect := card_get_rect(card)
+        hoverable_rect.height += CARD_HEIGHT
         if !is_hovering && 
             linalg.distance(card.position, card.target_position) < 2 &&
-            point_in_rect(mouse_gui_position, &card_rect) 
+            point_in_rect(mouse_gui_position, &hoverable_rect) 
         {
             hand.hover_index = i
         }
@@ -70,8 +77,9 @@ hand_step :: proc(game_state: ^Game_State) {
                 _card_position(hover_index, len(hand.cards)) + 
                 FVec2 { 0, - CARD_HEIGHT / 2}
 
-            card_rect := card_get_rect(card)
-            mouse_in_rect := point_in_rect(mouse_gui_position, &card_rect)
+            hoverable_rect := card_get_rect(card)
+            hoverable_rect.height += CARD_HEIGHT
+            mouse_in_rect := point_in_rect(mouse_gui_position, &hoverable_rect)
             if !mouse_in_rect {
                 _hand_unhover(hand)
             }
