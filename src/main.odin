@@ -67,6 +67,9 @@ _main_step :: proc(game_state: ^Game_State) {
 	hand_step(game_state)
 }
 
+COLOR_BACKGROUND_DARK: rl.Color : {21, 18, 20, 255}
+COLOR_BACKGROUND_LIGHT: rl.Color : {29, 25, 27, 255}
+
 @(private = "file")
 _main_draw :: proc(game_state: ^Game_State) {
 	camera := &game_state.graphics.camera
@@ -77,14 +80,14 @@ _main_draw :: proc(game_state: ^Game_State) {
 	rl.BeginTextureMode(game_state.graphics.surface)
 	{
 		// Background
-		rl.ClearBackground({0, 0, 0, 255})
+		rl.ClearBackground(COLOR_BACKGROUND_DARK)
 		for x in 0 ..= SURFACE_WIDTH / GRID_SIZE {
 			for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
 				if ((x % 2) + (y % 2)) != 1 do continue
 				rl.DrawRectangleV(
 					camera_world_to_surface(camera, IVec2{x, y}),
 					{GRID_SIZE, GRID_SIZE},
-					{40, 26, 30, 255},
+					COLOR_BACKGROUND_LIGHT,
 				)
 			}
 		}
