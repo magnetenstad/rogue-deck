@@ -95,7 +95,6 @@ _main_draw :: proc(game_state: ^Game_State) {
 		// Card range
 		card_index, is_hovering := game_state.hand.hover_index.(int)
 		if is_hovering {
-			player := get_player()
 			card := &game_state.hand.cards[card_index]
 			world_positions := card_get_positions(&card.card)
 			for world_position in world_positions {

@@ -22,7 +22,6 @@ _Serializable_Game_State :: struct {
 
 game_state_create :: proc() -> Game_State {
 	game_state := Game_State{}
-	rng := rand.create(0)
 
 	game_state.player_id = world_add_entity(
 		&game_state.world,
@@ -30,10 +29,10 @@ game_state_create :: proc() -> Game_State {
 	)
 
 	// World
-	for i in 0 ..< 16 {
+	for _ in 0 ..< 16 {
 		position := i_vec_2(
-			math.floor(rand.float32(&rng) * SURFACE_WIDTH / GRID_SIZE),
-			math.floor(rand.float32(&rng) * SURFACE_HEIGHT / GRID_SIZE),
+			math.floor(rand.float32() * SURFACE_WIDTH / GRID_SIZE),
+			math.floor(rand.float32() * SURFACE_HEIGHT / GRID_SIZE),
 		)
 		world_add_entity(
 			&game_state.world,
