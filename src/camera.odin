@@ -12,12 +12,18 @@ Camera :: struct {
 camera_step :: proc(camera: ^Camera, world: ^World) {
 	target_entity, _ := world_get_entity(world, camera.target_id).(^Entity)
 
-	target_position_world := target_entity.draw_position - f_vec_2(camera.view_size) / 2
+	target_position_world :=
+		target_entity.draw_position - f_vec_2(camera.view_size) / 2
 
 	scale := camera_surface_scale(camera)
 	target_position := target_position_world * GRID_SIZE * scale
 
-	camera.position = move_towards(camera.position, target_position, CAMERA_SPEED, 0.25)
+	camera.position = move_towards(
+		camera.position,
+		target_position,
+		CAMERA_SPEED,
+		0.25,
+	)
 }
 
 camera_gui_mouse_position :: proc(camera: ^Camera) -> FVec2 {
@@ -65,18 +71,27 @@ _camera_world_to_surface_f :: proc(camera: ^Camera, value: f32) -> f32 {
 }
 
 @(private = "file")
-_camera_world_to_surface_i_vec :: proc(camera: ^Camera, position: IVec2) -> FVec2 {
+_camera_world_to_surface_i_vec :: proc(
+	camera: ^Camera,
+	position: IVec2,
+) -> FVec2 {
 	return camera_world_to_surface(camera, f_vec_2(position))
 }
 
 @(private = "file")
-_camera_world_to_surface_f_vec :: proc(camera: ^Camera, position: FVec2) -> FVec2 {
+_camera_world_to_surface_f_vec :: proc(
+	camera: ^Camera,
+	position: FVec2,
+) -> FVec2 {
 	scale := camera_surface_scale(camera)
 	return position * GRID_SIZE - floor_v(camera.position / scale)
 }
 
 @(private = "file")
-_camera_world_to_surface_rect :: proc(camera: ^Camera, rect: rl.Rectangle) -> rl.Rectangle {
+_camera_world_to_surface_rect :: proc(
+	camera: ^Camera,
+	rect: rl.Rectangle,
+) -> rl.Rectangle {
 	position := camera_world_to_surface(camera, FVec2{rect.x, rect.y})
 	width := rect.width * GRID_SIZE
 	height := rect.height * GRID_SIZE

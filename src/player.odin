@@ -61,6 +61,9 @@ player_start_turn :: proc(game_state: ^Game_State) {
 		hand_draw_from_deck(&game_state.hand, &game_state.deck)
 	}
 	for _ in 0 ..< game_state.hand.mana_regen {
-		game_state.hand.mana = min(game_state.hand.mana_max, game_state.hand.mana + 1)
+		game_state.hand.mana = min(
+			game_state.hand.mana_max,
+			game_state.hand.mana + 1,
+		)
 	}
 }

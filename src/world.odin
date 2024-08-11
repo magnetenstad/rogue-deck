@@ -4,14 +4,14 @@ package main
 import "core:math"
 
 World :: struct {
-	chunks:         map[IVec2]_Chunk,
-	entities:       [dynamic]Entity,
-	next_entity_id: int,
+	chunks:               map[IVec2]_Chunk,
+	entities:             [dynamic]Entity,
+	next_world_object_id: int,
 }
 
 @(private = "file")
 _Chunk :: struct {
-	entity_ids: [dynamic]int,
+	world_object_id: [dynamic]int,
 }
 
 world_to_chunk_entity :: proc(entity: ^Entity) -> IVec2 {
@@ -37,8 +37,8 @@ world_to_chunk :: proc {
 
 world_add_entity :: proc(world: ^World, entity: Entity) -> int {
 	entity := entity
-	entity.id = world.next_entity_id
-	world.next_entity_id += 1
+	entity.id = world.next_world_object_id
+	world.next_world_object_id += 1
 	append(&world.entities, entity)
 	chunk_add_entity(world, entity.id)
 	return entity.id
@@ -62,16 +62,16 @@ chunk_add_entity :: proc(world: ^World, entity_id: int) {
 		print(chunk_position)
 	}
 	chunk := &world.chunks[chunk_position]
-	append(&chunk.entity_ids, entity.id)
+	append(&chunk.world_object_id, entity.id)
 	entity.chunk = chunk_position
 }
 
 // Removes the entity from entity.chunk
 chunk_remove_entity :: proc(world: ^World, entity: ^Entity) -> bool {
 	chunk := &world.chunks[entity.chunk]
-	for entity_id, i in chunk.entity_ids {
+	for entity_id, i in chunk.world_object_id {
 		if entity_id == entity.id {
-			unordered_remove(&chunk.entity_ids, i)
+			unordered_remove(&chunk.world_object_id, i)
 			return true
 		}
 	}
@@ -79,7 +79,10 @@ chunk_remove_entity :: proc(world: ^World, entity: ^Entity) -> bool {
 }
 
 
-world_get_entities_around :: proc(world: ^World, world_position: IVec2) -> [dynamic]int {
+world_get_entities_around :: proc(
+	world: ^World,
+	world_position: IVec2,
+) -> [dynamic]int {
 
 	entity_ids: [dynamic]int
 
@@ -93,7 +96,7 @@ world_get_entities_around :: proc(world: ^World, world_position: IVec2) -> [dyna
 			if chunk_position not_in world.chunks do continue
 
 			chunk := world.chunks[chunk_position]
-			append(&entity_ids, ..chunk.entity_ids[:])
+			append(&entity_ids, ..chunk.world_object_id[:])
 		}
 	}
 
@@ -108,12 +111,15 @@ chunk_validate :: proc(world: ^World, entity: ^Entity) {
 }
 
 @(private = "file")
-_world_get_entity_from_position :: proc(world: ^World, world_position: IVec2) -> Maybe(^Entity) {
+_world_get_entity_from_position :: proc(
+	world: ^World,
+	world_position: IVec2,
+) -> Maybe(^Entity) {
 
 	chunk_position := world_to_chunk(world_position)
 	if chunk_position not_in world.chunks do return nil
 	chunk := world.chunks[chunk_position]
-	for entity_id in chunk.entity_ids {
+	for entity_id in chunk.world_object_id {
 		entity, _ := world_get_entity(world, entity_id).(^Entity)
 		if entity.position == world_position {
 			return entity
@@ -123,7 +129,10 @@ _world_get_entity_from_position :: proc(world: ^World, world_position: IVec2) ->
 }
 
 @(private = "file")
-_world_get_entity_from_id :: proc(world: ^World, entity_id: int) -> Maybe(^Entity) {
+_world_get_entity_from_id :: proc(
+	world: ^World,
+	entity_id: int,
+) -> Maybe(^Entity) {
 	index := world_get_entity_index(world, entity_id)
 	if index < 0 {
 		return nil

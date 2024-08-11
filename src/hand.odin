@@ -73,7 +73,8 @@ hand_step :: proc(game_state: ^Game_State) {
 		if !hand.hover_is_selected {
 			card.target_scale = 1.5
 			card.target_position =
-				_card_position(hover_index, len(hand.cards)) + FVec2{0, -CARD_HEIGHT / 2}
+				_card_position(hover_index, len(hand.cards)) +
+				FVec2{0, -CARD_HEIGHT / 2}
 
 			hoverable_rect := card_get_rect(card)
 			hoverable_rect.height += CARD_HEIGHT
@@ -110,12 +111,19 @@ hand_step_player :: proc(game_state: ^Game_State) {
 
 		if hand.hover_is_selected {
 			card.target_scale = 2
-			card.target_position = mouse_gui_position + FVec2{CARD_WIDTH * 2, CARD_HEIGHT / 2}
+			card.target_position =
+				mouse_gui_position + FVec2{CARD_WIDTH * 2, CARD_HEIGHT / 2}
 			mouse_world_position := camera_world_mouse_position(camera)
 			hand.hover_target = mouse_world_position
 
 			if rl.IsMouseButtonReleased(.LEFT) {
-				if hand_play(hand, hover_index, deck, world, mouse_world_position) {
+				if hand_play(
+					hand,
+					hover_index,
+					deck,
+					world,
+					mouse_world_position,
+				) {
 					player_end_turn(game_state)
 				}
 				_hand_unhover(hand)
@@ -141,7 +149,13 @@ _card_position :: proc(i: int, n: int) -> FVec2 {
 	return origin + offset
 }
 
-hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck, world: ^World, position: IVec2) -> bool {
+hand_play :: proc(
+	hand: ^Hand,
+	index: int,
+	deck: ^Deck,
+	world: ^World,
+	position: IVec2,
+) -> bool {
 	if index >= len(hand.cards) do return false
 
 	card := hand.cards[index]
@@ -151,7 +165,7 @@ hand_play :: proc(hand: ^Hand, index: int, deck: ^Deck, world: ^World, position:
 	if !card.card.play(world, position) do return false
 
 	hand.mana -= card.card.cost
-	if (!card.card.unbreakable) {
+	if !card.card.unbreakable {
 		ordered_remove(&hand.cards, index)
 		append(&deck.cards, card.card)
 		deck_shuffle(deck)
@@ -186,7 +200,12 @@ hand_draw_gui :: proc(hand: ^Hand, camera: ^Camera) {
 		gui_position := camera_world_to_gui(camera, hover_target)
 		scale := camera_surface_scale(camera)
 		rl.DrawRectangleRoundedLines(
-			rl.Rectangle{gui_position.x, gui_position.y, GRID_SIZE * scale, GRID_SIZE * scale},
+			rl.Rectangle {
+				gui_position.x,
+				gui_position.y,
+				GRID_SIZE * scale,
+				GRID_SIZE * scale,
+			},
 			0.1,
 			16,
 			4,
@@ -194,10 +213,24 @@ hand_draw_gui :: proc(hand: ^Hand, camera: ^Camera) {
 		)
 	}
 
-	mana_text := format("Mana: ", hand.mana, "/", hand.mana_max, " |+", hand.mana_regen)
+	mana_text := format(
+		"Mana: ",
+		hand.mana,
+		"/",
+		hand.mana_max,
+		" |+",
+		hand.mana_regen,
+	)
 	draw_text(mana_text, {16, 64}, color = rl.BLUE)
 
-	cards_text := format("Cards: ", len(hand.cards), "/", hand.cards_max, " |+", hand.cards_regen)
+	cards_text := format(
+		"Cards: ",
+		len(hand.cards),
+		"/",
+		hand.cards_max,
+		" |+",
+		hand.cards_regen,
+	)
 	draw_text(cards_text, {16, 96})
 }
 

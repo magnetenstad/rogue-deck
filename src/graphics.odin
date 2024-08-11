@@ -50,18 +50,27 @@ graphics_create :: proc(game_state: ^Game_State) {
 	rl.SetTargetFPS(60)
 
 	when DEV && DESKTOP {
-		rl.SetWindowPosition(1920 * 2, -256)
+		rl.SetWindowPosition(1920, 32)
 	}
 
 	game_state.graphics.sprites = _load_sprites()
 	game_state.graphics.fonts = _load_fonts()
 	rl.GuiSetFont(game_state.graphics.fonts[Font_Id.lilita_one_regular])
 
-	game_state.graphics.surface = rl.LoadRenderTexture(SURFACE_WIDTH, SURFACE_HEIGHT)
-	rl.SetTextureFilter(game_state.graphics.surface.texture, rl.TextureFilter.POINT)
+	game_state.graphics.surface = rl.LoadRenderTexture(
+		SURFACE_WIDTH,
+		SURFACE_HEIGHT,
+	)
+	rl.SetTextureFilter(
+		game_state.graphics.surface.texture,
+		rl.TextureFilter.POINT,
+	)
 
 	game_state.graphics.camera.target_id = game_state.player_id
-	game_state.graphics.camera.view_size = {SURFACE_WIDTH / GRID_SIZE, SURFACE_HEIGHT / GRID_SIZE}
+	game_state.graphics.camera.view_size = {
+		SURFACE_WIDTH / GRID_SIZE,
+		SURFACE_HEIGHT / GRID_SIZE,
+	}
 }
 
 @(private = "file")

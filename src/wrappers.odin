@@ -24,5 +24,12 @@ draw_text :: proc(
 	color: rl.Color = rl.WHITE,
 	font: Font_Id = FONT_DEFAULT,
 ) {
-	rl.DrawTextEx(get_game_state().graphics.fonts[font], cstr(text), position, size, 0, color)
+	rl.DrawTextEx(
+		get_game_state().graphics.fonts[font],
+		cstr(text),
+		position,
+		size,
+		0,
+		color,
+	)
 }

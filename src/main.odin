@@ -13,7 +13,10 @@ get_game_state :: proc() -> ^Game_State {
 
 get_player :: proc() -> ^Entity {
 	game_state := get_game_state()
-	player, _ := world_get_entity(&game_state.world, game_state.player_id).(^Entity)
+	player, _ := world_get_entity(
+		&game_state.world,
+		game_state.player_id,
+	).(^Entity)
 	return player
 }
 
@@ -49,7 +52,8 @@ _main_step :: proc(game_state: ^Game_State) {
 	).(^Entity)
 
 	if has_current_entity {
-		switch current_entity.kind {
+		switch current_entity.kind 
+		{
 		case .player:
 			player_step(current_entity)
 
@@ -78,6 +82,7 @@ _main_draw :: proc(game_state: ^Game_State) {
 
 	// Draw onto texture
 	rl.BeginTextureMode(game_state.graphics.surface)
+
 	{
 		// Background
 		rl.ClearBackground(COLOR_BACKGROUND_DARK)
@@ -98,18 +103,32 @@ _main_draw :: proc(game_state: ^Game_State) {
 			card := &game_state.hand.cards[card_index]
 			world_positions := card_get_positions(&card.card)
 			for world_position in world_positions {
-				surface_position := camera_world_to_surface(camera, world_position)
+				surface_position := camera_world_to_surface(
+					camera,
+					world_position,
+				)
 				rl.DrawRectangleRec(
-					rl.Rectangle{surface_position.x, surface_position.y, GRID_SIZE, GRID_SIZE},
+					rl.Rectangle {
+						surface_position.x,
+						surface_position.y,
+						GRID_SIZE,
+						GRID_SIZE,
+					},
 					rl.Color{130, 150, 155, 164},
 				)
 			}
 		}
 
 		// Entities
-		for entity_id in world_get_entities_around(&game_state.world, player.position) {
+		for entity_id in world_get_entities_around(
+			&game_state.world,
+			player.position,
+		) {
 
-			entity, _ := world_get_entity(&game_state.world, entity_id).(^Entity)
+			entity, _ := world_get_entity(
+				&game_state.world,
+				entity_id,
+			).(^Entity)
 			entity_draw(entity)
 		}
 	}
@@ -117,6 +136,7 @@ _main_draw :: proc(game_state: ^Game_State) {
 
 	// Draw texture onto screen
 	rl.BeginDrawing()
+
 	{
 		rl.ClearBackground(rl.BLACK)
 		texture := game_state.graphics.surface.texture
@@ -144,9 +164,15 @@ _main_draw :: proc(game_state: ^Game_State) {
 		draw_text(format(rl.GetFPS()), {16, 16})
 
 		// GUI
-		for entity_id in world_get_entities_around(&game_state.world, player.position) {
+		for entity_id in world_get_entities_around(
+			&game_state.world,
+			player.position,
+		) {
 
-			entity, _ := world_get_entity(&game_state.world, entity_id).(^Entity)
+			entity, _ := world_get_entity(
+				&game_state.world,
+				entity_id,
+			).(^Entity)
 			entity_draw_gui(entity)
 		}
 

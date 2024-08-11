@@ -3,7 +3,12 @@ package main
 
 import rl "vendor:raylib"
 
-gui_button :: proc(text: string, position: FVec2, on_click: proc(), scale: f32 = 1) {
+gui_button :: proc(
+	text: string,
+	position: FVec2,
+	on_click: proc(),
+	scale: f32 = 1,
+) {
 	rect := rl.Rectangle {
 		position.x - 16 * scale,
 		position.y - 8 * scale,

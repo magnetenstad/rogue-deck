@@ -25,7 +25,12 @@ game_state_create :: proc() -> Game_State {
 
 	game_state.player_id = world_add_entity(
 		&game_state.world,
-		Entity{kind = .player, sprite_id = .player, position = {8, 8}, health = 10},
+		Entity {
+			kind = .player,
+			sprite_id = .player,
+			position = {8, 8},
+			health = 10,
+		},
 	)
 
 	// World
@@ -36,7 +41,12 @@ game_state_create :: proc() -> Game_State {
 		)
 		world_add_entity(
 			&game_state.world,
-			Entity{kind = .enemy, sprite_id = .skeleton, position = position, health = 2},
+			Entity {
+				kind = .enemy,
+				sprite_id = .skeleton,
+				position = position,
+				health = 2,
+			},
 		)
 	}
 
@@ -63,7 +73,12 @@ game_state_create :: proc() -> Game_State {
 	return game_state
 }
 
-game_state_serialize :: proc(game_state: ^Game_State) -> (data: []byte, err: json.Marshal_Error) {
+game_state_serialize :: proc(
+	game_state: ^Game_State,
+) -> (
+	data: []byte,
+	err: json.Marshal_Error,
+) {
 
 	serializable := _Serializable_Game_State {
 		entities  = game_state.world.entities,

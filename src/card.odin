@@ -44,7 +44,10 @@ card_draw_gui :: proc(card: ^PhysicalCard) {
 		font = .nova_square_regular,
 	)
 
-	cost_position := FVec2{rect.x + rect.width * 0.1, rect.y + rect.width * 0.1}
+	cost_position := FVec2 {
+		rect.x + rect.width * 0.1,
+		rect.y + rect.width * 0.1,
+	}
 	draw_text(
 		format(card.card.cost),
 		cost_position,
@@ -79,7 +82,11 @@ card_get :: proc(card_id: Card_Id) -> Card {
 			play = proc(world: ^World, position: IVec2) -> bool {
 				world_add_entity(
 					world,
-					Entity{kind = .enemy, sprite_id = .skeleton, position = position},
+					Entity {
+						kind = .enemy,
+						sprite_id = .skeleton,
+						position = position,
+					},
 				)
 				return true
 			},
@@ -134,9 +141,12 @@ card_get :: proc(card_id: Card_Id) -> Card {
 			cost = 4,
 		}
 	}
-	return Card{name = "Empty", play = proc(world: ^World, position: IVec2) -> bool {
+	return Card {
+		name = "Empty",
+		play = proc(world: ^World, position: IVec2) -> bool {
 			return true
-		}}
+		},
+	}
 }
 
 card_get_positions :: proc(card: ^Card) -> []IVec2 {
