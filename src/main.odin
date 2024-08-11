@@ -103,17 +103,14 @@ _main_draw :: proc(game_state: ^Game_State) {
 			card := &game_state.hand.cards[card_index]
 			world_positions := card_get_positions(&card.card)
 			for world_position in world_positions {
-				surface_position := camera_world_to_surface(
-					camera,
-					world_position,
+				surface_position := i32_vec_2(
+					camera_world_to_surface(camera, world_position),
 				)
-				rl.DrawRectangleRec(
-					rl.Rectangle {
-						surface_position.x,
-						surface_position.y,
-						GRID_SIZE,
-						GRID_SIZE,
-					},
+				rl.DrawRectangleLines(
+					surface_position.x,
+					surface_position.y,
+					GRID_SIZE + 1,
+					GRID_SIZE + 1,
 					rl.Color{130, 150, 155, 164},
 				)
 			}
@@ -143,8 +140,8 @@ _main_draw :: proc(game_state: ^Game_State) {
 		surface_origin := camera_surface_origin(camera)
 		// Hack to make camera smooth
 		subpixel := FVec2 {
-			mfloor(camera.position.x, scale) - camera.position.x,
-			mfloor(camera.position.y, scale) - camera.position.y,
+			floor_to_multiple(camera.position.x, scale) - camera.position.x,
+			floor_to_multiple(camera.position.y, scale) - camera.position.y,
 		}
 
 		rl.DrawTexturePro(
