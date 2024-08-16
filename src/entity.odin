@@ -43,6 +43,7 @@ entity_draw :: proc(entity: ^Entity) {
 		&graphics.camera,
 		entity.draw_position,
 	)
+	rl.DrawTextureEx(texture, surface_position - {1, 0}, 0, 1.0, rl.BLACK)
 	rl.DrawTextureEx(texture, surface_position, 0, 1.0, rl.WHITE)
 }
 
