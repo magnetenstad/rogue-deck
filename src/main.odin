@@ -88,11 +88,12 @@ _main_draw :: proc(game_state: ^Game_State) {
 		rl.ClearBackground(COLOR_BACKGROUND_DARK)
 		for x in 0 ..= SURFACE_WIDTH / GRID_SIZE {
 			for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
-				if ((x % 2) + (y % 2)) != 1 do continue
+				tile, ok := world_get_tile(&game_state.world, {x, y}).(^Tile)
+				color := ok ? tile_get_color(tile) : COLOR_BACKGROUND_LIGHT
 				rl.DrawRectangleV(
 					camera_world_to_surface(camera, IVec2{x, y}),
 					{GRID_SIZE, GRID_SIZE},
-					COLOR_BACKGROUND_LIGHT,
+					color,
 				)
 			}
 		}
