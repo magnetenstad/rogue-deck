@@ -13,7 +13,7 @@ Enemy_Move :: enum {
 
 enemy_moves: []Enemy_Move = {.left, .right, .up, .down, .nothing}
 
-enemy_step :: proc(enemy: ^Entity) {
+enemy_step :: proc(world: ^World, enemy: ^Entity) {
 	assert(enemy.kind == .enemy)
 	if enemy.done do return
 
@@ -32,11 +32,16 @@ enemy_step :: proc(enemy: ^Entity) {
 		append(&enemy_moves, Enemy_Move.up)
 	}
 
+	next_position := enemy.position
 	move := rand.choice(enemy_moves[:])
-	if move == .up do enemy.position.y -= 1
-	if move == .left do enemy.position.x -= 1
-	if move == .down do enemy.position.y += 1
-	if move == .right do enemy.position.x += 1
+	if move == .up do next_position.y -= 1
+	if move == .left do next_position.x -= 1
+	if move == .down do next_position.y += 1
+	if move == .right do next_position.x += 1
+
+	if world_is_empty(world, next_position) {
+		enemy.position = next_position
+	}
 
 	enemy.done = true
 }

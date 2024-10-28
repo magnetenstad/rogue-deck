@@ -58,7 +58,7 @@ _main_step :: proc(game_state: ^Game_State) {
 			player_step(current_entity)
 
 		case .enemy:
-			enemy_step(current_entity)
+			enemy_step(&game_state.world, current_entity)
 		}
 		entity_step(current_entity)
 	}
