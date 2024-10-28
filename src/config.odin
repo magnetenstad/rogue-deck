@@ -1,8 +1,8 @@
-//+vet unused shadowing using-stmt style semicolon
+#+vet unused shadowing using-stmt style semicolon
 package main
 
 DEV :: true
-DESKTOP :: false
+DESKTOP :: true
 
 LOAD_SAVE :: false
 

@@ -1,4 +1,4 @@
-//+vet unused shadowing using-stmt style semicolon
+#+vet unused shadowing using-stmt style semicolon
 package main
 
 import "core:encoding/json"

@@ -1,4 +1,4 @@
-//+vet unused shadowing using-stmt style semicolon
+#+vet unused shadowing using-stmt style semicolon
 package main
 
 import "core:math"
@@ -72,9 +72,11 @@ _move_towards_vec :: proc(
 	min_length: f32 = ONE_PIXEL,
 ) -> FVec2 {
 	difference := (target - position)
-	if linalg.length(difference) < min_length {
+	length := linalg.length(difference)
+
+	if length <= min_length {
 		return target
-	} else if linalg.length(difference) * multiplier < min_length {
+	} else if length * multiplier <= min_length {
 		return position + linalg.normalize(difference) * min_length
 	} else {
 		return position + difference * multiplier

@@ -1,4 +1,4 @@
-//+vet unused shadowing using-stmt style semicolon
+#+vet unused shadowing using-stmt style semicolon
 package main
 
 import "core:os"
@@ -89,11 +89,13 @@ _main_draw :: proc(game_state: ^Game_State) {
 		for x in 0 ..= SURFACE_WIDTH / GRID_SIZE {
 			for y in 0 ..= SURFACE_HEIGHT / GRID_SIZE {
 				tile, ok := world_get_tile(&game_state.world, {x, y}).(^Tile)
-				color := ok ? tile_get_color(tile) : COLOR_BACKGROUND_LIGHT
+				if !ok do continue
+				dark, light := tile_get_color(tile)
+				is_light := ((x % 2) + (y % 2)) != 1
 				rl.DrawRectangleV(
 					camera_world_to_surface(camera, IVec2{x, y}),
 					{GRID_SIZE, GRID_SIZE},
-					color,
+					is_light ? light : dark,
 				)
 			}
 		}

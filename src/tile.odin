@@ -1,4 +1,4 @@
-//+vet unused shadowing using-stmt style semicolon
+#+vet unused shadowing using-stmt style semicolon
 package main
 
 import rl "vendor:raylib"
@@ -39,9 +39,15 @@ tile_remove_modifier :: proc(tile: ^Tile, modifier: Tile_Modifier) {
 	tile._modifiers -= {modifier}
 }
 
-tile_get_color :: proc(tile: ^Tile) -> rl.Color {
-	if .fire in tile._modifiers do return {255, 10, 10, 255}
-	if .water in tile._modifiers do return {10, 10, 255, 255}
-	if .grass in tile._modifiers do return {10, 255, 10, 255}
-	return COLOR_BACKGROUND_LIGHT
+tile_get_color :: proc(tile: ^Tile) -> (rl.Color, rl.Color) {
+	if .fire in tile._modifiers {
+		return {37, 25, 25, 255}, {49, 26, 18, 255}
+	}
+	if .water in tile._modifiers {
+		return {21, 21, 57, 255}, {31, 35, 73, 255}
+	}
+	if .grass in tile._modifiers {
+		return {22, 41, 26, 255}, {34, 47, 34, 255}
+	}
+	return COLOR_BACKGROUND_DARK, COLOR_BACKGROUND_LIGHT
 }
