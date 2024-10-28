@@ -2,7 +2,7 @@
 package main
 
 import "core:math"
-import "core:math/rand"
+import "core:math/noise"
 
 World :: struct {
 	chunks:               map[IVec2]_Chunk,
@@ -12,6 +12,7 @@ World :: struct {
 
 @(private = "file")
 _Chunk :: struct {
+	position:         IVec2,
 	world_object_ids: [dynamic]int,
 	tiles:            [CHUNK_WIDTH]([CHUNK_HEIGHT]Tile),
 }
@@ -79,7 +80,9 @@ chunk_add_entity :: proc(world: ^World, entity_id: int) {
 	chunk_position := world_to_chunk(entity.position)
 
 	if chunk_position not_in world.chunks {
-		world.chunks[chunk_position] = _Chunk{}
+		world.chunks[chunk_position] = _Chunk {
+			position = chunk_position,
+		}
 		chunk_tile_random(&world.chunks[chunk_position])
 		print(chunk_position)
 	}
@@ -91,10 +94,21 @@ chunk_add_entity :: proc(world: ^World, entity_id: int) {
 chunk_tile_random :: proc(chunk: ^_Chunk) {
 	for x in 0 ..< CHUNK_WIDTH {
 		for y in 0 ..< CHUNK_HEIGHT {
-			tile_add_modifier(
-				&chunk.tiles[x][y],
-				rand.choice_enum(Tile_Modifier),
+			div := 16.0
+			h := noise.noise_2d(
+				1,
+				{
+					f64(chunk.position.x * CHUNK_WIDTH + x) / div,
+					f64(chunk.position.y * CHUNK_HEIGHT + y) / div,
+				},
 			)
+			if h < -0.5 {
+				tile_add_modifier(&chunk.tiles[x][y], Tile_Modifier.fire)
+			} else if h < 0 {
+				tile_add_modifier(&chunk.tiles[x][y], Tile_Modifier.grass)
+			} else if h < 0.5 {
+				tile_add_modifier(&chunk.tiles[x][y], Tile_Modifier.water)
+			}
 		}
 	}
 }
