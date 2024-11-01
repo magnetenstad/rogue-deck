@@ -13,7 +13,6 @@ Card_Id :: enum {
 
 Card :: struct {
 	name:        string,
-	cost:        int,
 	attack:      int,
 	play:        proc(_: ^World, _: IVec2) -> bool,
 	range:       f32,
@@ -42,18 +41,6 @@ card_draw_gui :: proc(card: ^PhysicalCard) {
 		size = 16 * card.scale,
 		color = rl.BLACK,
 		font = .nova_square_regular,
-	)
-
-	cost_position := FVec2 {
-		rect.x + rect.width * 0.1,
-		rect.y + rect.width * 0.1,
-	}
-	draw_text(
-		format(card.card.cost),
-		cost_position,
-		size = 32 * card.scale,
-		color = rl.BLUE,
-		font = .lilita_one_regular,
 	)
 }
 
@@ -91,7 +78,6 @@ card_get :: proc(card_id: Card_Id) -> Card {
 				return true
 			},
 			range = 4.2,
-			cost = 3,
 		}
 	case .teleport:
 		return Card {
@@ -102,7 +88,6 @@ card_get :: proc(card_id: Card_Id) -> Card {
 				return true
 			},
 			range = 5.2,
-			cost = 1,
 		}
 	case .dagger:
 		return Card {
@@ -120,7 +105,6 @@ card_get :: proc(card_id: Card_Id) -> Card {
 				return hit
 			},
 			range = 1.2,
-			cost = 1,
 		}
 	case .fire_ball:
 		return Card {
@@ -138,7 +122,6 @@ card_get :: proc(card_id: Card_Id) -> Card {
 				return hit
 			},
 			range = 2.2,
-			cost = 4,
 		}
 	}
 	return Card {
