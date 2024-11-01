@@ -13,7 +13,7 @@ Enemy_Move :: enum {
 
 enemy_moves: []Enemy_Move = {.left, .right, .up, .down, .nothing}
 
-enemy_step :: proc(world: ^World, enemy: ^Entity) {
+enemy_step :: proc(game_state: ^Game_State, enemy: ^Entity) {
 	assert(enemy.kind == .enemy)
 	if enemy.done do return
 
@@ -39,7 +39,7 @@ enemy_step :: proc(world: ^World, enemy: ^Entity) {
 	if move == .down do next_position.y += 1
 	if move == .right do next_position.x += 1
 
-	if world_is_empty(world, next_position) {
+	if world_is_empty(&game_state.world, next_position) {
 		enemy.position = next_position
 	}
 

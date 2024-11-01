@@ -55,10 +55,10 @@ _main_step :: proc(game_state: ^Game_State) {
 		switch current_entity.kind 
 		{
 		case .player:
-			player_step(current_entity)
+			player_step(game_state, current_entity)
 
 		case .enemy:
-			enemy_step(&game_state.world, current_entity)
+			enemy_step(game_state, current_entity)
 		}
 		entity_step(current_entity)
 	}
@@ -175,7 +175,7 @@ _main_draw :: proc(game_state: ^Game_State) {
 			).(^Entity)
 			entity_draw_gui(entity)
 		}
-
+		player_draw_gui(game_state, player)
 		hand_draw_gui(&game_state.hand, camera)
 	}
 	rl.EndDrawing()
