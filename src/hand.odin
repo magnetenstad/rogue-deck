@@ -23,9 +23,6 @@ Hand :: struct {
 	cards:             [dynamic]PhysicalCard,
 	cards_regen:       int,
 	cards_max:         int,
-	mana:              int,
-	mana_regen:        int,
-	mana_max:          int,
 	hover_index:       Maybe(int),
 	hover_target:      Maybe(IVec2),
 	hover_is_selected: bool,
@@ -159,12 +156,10 @@ hand_play :: proc(
 	if index >= len(hand.cards) do return false
 
 	card := hand.cards[index]
-	if card.card.cost > hand.mana do return false
 	positions := card_get_positions(&card.card)
 	if !slice.contains(positions, position) do return false
 	if !card.card.play(world, position) do return false
 
-	hand.mana -= card.card.cost
 	if !card.card.unbreakable {
 		ordered_remove(&hand.cards, index)
 		append(&deck.cards, card.card)
@@ -212,16 +207,6 @@ hand_draw_gui :: proc(hand: ^Hand, camera: ^Camera) {
 			rl.WHITE,
 		)
 	}
-
-	mana_text := format(
-		"Mana: ",
-		hand.mana,
-		"/",
-		hand.mana_max,
-		" |+",
-		hand.mana_regen,
-	)
-	draw_text(mana_text, {16, 64}, color = rl.BLUE)
 
 	cards_text := format(
 		"Cards: ",

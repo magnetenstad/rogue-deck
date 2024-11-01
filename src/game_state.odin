@@ -61,8 +61,6 @@ game_state_create :: proc() -> Game_State {
 	// Hand
 	game_state.hand.cards_max = 8
 	game_state.hand.cards_regen = 1
-	game_state.hand.mana_max = 10
-	game_state.hand.mana_regen = 2
 	unbreakable_card := card_get(.teleport)
 	unbreakable_card.unbreakable = true
 	append(&game_state.hand.cards, PhysicalCard{card = unbreakable_card})

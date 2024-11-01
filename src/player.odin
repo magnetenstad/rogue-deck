@@ -14,14 +14,6 @@ player_step :: proc(player: ^Entity) {
 
 	game_state := get_game_state()
 	hand_step_player(game_state)
-
-	costs, _ := slice.mapper(
-		game_state.hand.cards[:],
-		proc(c: PhysicalCard) -> int {return c.card.cost},
-	)
-	if slice.max(costs) > game_state.hand.mana {
-		player_end_turn(game_state)
-	}
 }
 
 @(private = "file")
@@ -59,11 +51,5 @@ player_end_turn :: proc(game_state: ^Game_State) {
 player_start_turn :: proc(game_state: ^Game_State) {
 	for _ in 0 ..< game_state.hand.cards_regen {
 		hand_draw_from_deck(&game_state.hand, &game_state.deck)
-	}
-	for _ in 0 ..< game_state.hand.mana_regen {
-		game_state.hand.mana = min(
-			game_state.hand.mana_max,
-			game_state.hand.mana + 1,
-		)
 	}
 }
