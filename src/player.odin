@@ -39,7 +39,7 @@ player_draw_gui :: proc(game_state: ^Game_State, player: ^Entity) {
 	   (mouse_position == player.position && is_player_turn()) {
 
 		gui_position := camera_world_to_gui(camera, player.position)
-		rl.DrawRectangleRoundedLines(
+		rl.DrawRectangleRoundedLinesEx(
 			rl.Rectangle {
 				gui_position.x,
 				gui_position.y,
@@ -55,7 +55,7 @@ player_draw_gui :: proc(game_state: ^Game_State, player: ^Entity) {
 
 	if clicked_player {
 		gui_position := camera_world_to_gui(camera, mouse_position)
-		rl.DrawRectangleRoundedLines(
+		rl.DrawRectangleRoundedLinesEx(
 			rl.Rectangle {
 				gui_position.x,
 				gui_position.y,

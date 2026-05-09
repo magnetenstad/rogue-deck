@@ -194,7 +194,7 @@ hand_draw_gui :: proc(hand: ^Hand, camera: ^Camera) {
 	if is_hovering && is_targeting {
 		gui_position := camera_world_to_gui(camera, hover_target)
 		scale := camera_surface_scale(camera)
-		rl.DrawRectangleRoundedLines(
+		rl.DrawRectangleRoundedLinesEx(
 			rl.Rectangle {
 				gui_position.x,
 				gui_position.y,

@@ -17,7 +17,7 @@ enemy_step :: proc(game_state: ^Game_State, enemy: ^Entity) {
 	assert(enemy.kind == .enemy)
 	if enemy.done do return
 
-	enemy_moves: [dynamic]Enemy_Move = {.nothing}
+	enemy_moves: [dynamic]Enemy_Move
 	player := get_player()
 	if player.position.x > enemy.position.x {
 		append(&enemy_moves, Enemy_Move.right)

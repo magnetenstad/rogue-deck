@@ -22,8 +22,11 @@ get_player :: proc() -> ^Entity {
 
 main :: proc() {
 	// Read save file and create game state
-	data_read, ok := os.read_entire_file("saves/data.json")
-	if ok && LOAD_SAVE {
+	data_read, err := os.read_entire_file_from_path(
+		"saves/data.json",
+		context.temp_allocator,
+	)
+	if err == nil && LOAD_SAVE {
 		_game_state = game_state_deserialize(data_read)
 	} else {
 		_game_state = game_state_create()
@@ -38,7 +41,7 @@ main :: proc() {
 
 	// Write save file and close
 	data_to_write, _ := game_state_serialize(&_game_state)
-	os.write_entire_file("saves/data.json", data_to_write)
+	_ = os.write_entire_file("saves/data.json", data_to_write)
 	rl.CloseWindow()
 }
 
@@ -52,8 +55,7 @@ _main_step :: proc(game_state: ^Game_State) {
 	).(^Entity)
 
 	if has_current_entity {
-		switch current_entity.kind 
-		{
+		switch current_entity.kind {
 		case .player:
 			player_step(game_state, current_entity)
 

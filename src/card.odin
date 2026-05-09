@@ -24,7 +24,7 @@ card_draw_gui :: proc(card: ^PhysicalCard) {
 	rect := card_get_rect(card)
 	rl.DrawRectangleRounded(rect, 0.2, 8, rl.WHITE)
 	outline_color := card_get_outline_color(&card.card)
-	rl.DrawRectangleRoundedLines(rect, 0.2, 8, 8, outline_color)
+	rl.DrawRectangleRoundedLinesEx(rect, 0.2, 8, 8, outline_color)
 	text_position := FVec2{rect.x + rect.width * 0.1, rect.y + rect.height / 2}
 	draw_text(
 		card.card.name,
